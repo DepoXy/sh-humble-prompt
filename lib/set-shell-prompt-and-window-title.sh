@@ -333,9 +333,9 @@ _hf_prompt_customize_shell_prompt_PS1 () {
         #   it's been eons since I last used Fedora).
         fg_path="${fg_gray}"
       else
-        echo "WARNING: Not enough info. to set PS1."
+        >&2 echo "ERROR: Unsupported OS / Cannot (well, will not) set PS1"
 
-        return
+        return 1
       fi
       PS1="${titlebar}${bg_magenta}${fg_gray}${cur_user}@${fg_yellow}${mach_name}${attr_reset}:${fg_path}${basename}${attr_reset}${prompt_symbol} "
     elif _hf_prompt_os_is_macos || [ "$(cat /proc/version | grep Ubuntu)" ]; then
@@ -383,7 +383,9 @@ _hf_prompt_customize_shell_prompt_PS1 () {
 
       PS1="${titlebar}${fg_cyan}${cur_user}@${fg_yellow}${mach_name}${attr_reset}:${fg_gray}${basename}${attr_reset}${prompt_symbol} "
     else
-      echo "WARNING: _hf_prompt_customize_shell_prompts_and_window_title: Not enough info. to set PS1."
+      >&2 echo "ERROR: Unsupported OS / Cannot (well, will not) set PS1"
+
+      return 1
     fi
   else
     # This is a chroot jail without a mounted /proc, or some other
