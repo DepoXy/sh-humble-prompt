@@ -387,7 +387,8 @@ _hf_prompt_customize_shell_prompt_PS1 () {
       echo "WARNING: _hf_prompt_customize_shell_prompts_and_window_title: Not enough info. to set PS1."
     fi
   else
-    # This is a chroot jail without a mounted /proc.
+    # This is a chroot jail without a mounted /proc, or some other
+    # flavor of Linux.
     : # Just use default prompt.
   fi
 
