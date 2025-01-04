@@ -12,6 +12,11 @@
 # - 2: Put parentheses around the prompt terminus, e.g., ($)
 HOMEFRIES_PS1_GIT_REBASE_STYLE=${HOMEFRIES_PS1_GIT_REBASE_STYLE:-2}
 
+# USAGE: Configure last-command-failed indicator style
+# - 0: Off
+# - 1: Color prompt red if last command failed e.g., $ [but in red]
+HOMEFRIES_PS1_PREV_CMD_FAILED_STYLE=${HOMEFRIES_PS1_PREV_CMD_FAILED_STYLE:-1}
+
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 _hf_prompt_is_user_logged_on_via_ssh () {
@@ -339,6 +344,19 @@ _hf_prompt_customize_shell_prompt_PS1 () {
     prompt_symbol='$([ -f "$(git root 2> /dev/null)/.git/rebase-merge/git-rebase-todo" ] && echo "(\$)" || echo "\$")'
   fi
 
+  # Highlight final prompt character "$" in red if previous command failed.
+  # - THANX: Inspired by Julia Evans blog post re: Fish shell:
+  #     https://jvns.ca/blog/2024/09/12/reasons-i--still--love-fish/#5-nice-default-prompt-including-git-integration
+  #   See also these Bash-related links:
+  #     https://stackoverflow.com/questions/16715103/bash-prompt-with-the-last-exit-code
+  #     https://github.com/dimo414/prompt.gem
+  if [ ${HOMEFRIES_PS1_PREV_CMD_FAILED_STYLE:-0} -eq 1 ]; then
+    prompt_symbol="\$(test \${_hf_exitcode:-0} -ne 0 && echo \"${fg_red}\")${prompt_symbol}\$(test \${_hf_exitcode:-0} -ne 0 && echo \"${attr_reset}\")"
+    # ALTLY: Use one test, but then the final PS1 string is longer (because
+    # ${prompt_symbol} is duplicated):
+    #   prompt_symbol="\$(test \${_hf_exitcode:-0} -ne 0 && echo \"${fg_red}${prompt_symbol}${attr_reset}\" || echo \"${prompt_symbol}\")"
+  fi
+
   # NOTE: Using "" below instead of '' so that ${titlebar} is resolved by the
   #       shell first.
   # ${HOMEFRIES_TRACE} && echo "PS1: Preparing prompt"
@@ -413,6 +431,10 @@ _hf_prompt_customize_shell_prompt_PS1 () {
     # This is a chroot jail without a mounted /proc, or some other
     # flavor of Linux.
     : # Just use default prompt.
+  fi
+
+  if [ ${HOMEFRIES_PS1_PREV_CMD_FAILED_STYLE:-0} -eq 1 ]; then
+    PS1="\$(_hf_exitcode=\$?; echo \"${PS1}\")"
   fi
 }
 
