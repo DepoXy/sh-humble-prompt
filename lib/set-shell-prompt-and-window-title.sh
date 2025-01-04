@@ -449,6 +449,8 @@ _hf_prompt_configure () {
   unset -f _hf_prompt_format_titlebar
 
   unset -f _hf_prompt_customize_shell_prompts_and_window_title
+
+  unset -f _hf_prompt_configure
 }
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
