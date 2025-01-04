@@ -277,6 +277,28 @@ _hf_prompt_customize_shell_prompts_and_window_title () {
 
 # ***
 
+# REFER: You can use PROMPT_COMMAND instead to set PS1.
+# - It's called before every prompt.
+#   - (Homefries uses it to call `_hist_util_hook_bg`.)
+# - E.g., if you disable all the `unset -f` calls herein,
+#   you could set:
+#     PROMPT_COMMAND=_hf_prompt_customize_shell_prompts_and_window_title
+#   and it'll set PS1 before every prompt.
+#   - Though note this runs noticeably slower than the normal
+#     prompt. Obviously, we could fix the fcns. herein to improve
+#     performance (e.g., if you just press enter at an empty
+#     prompt, you'll see a slight lag before the next prompt is
+#     printed). But I don't see any benefit to using PROMPT_COMMAND,
+#     as you can already embed code to run before every prompt
+#     into PS1.
+# - You can also skip PS1 and echo from the PROMPT_COMMAND
+#   callback directly, e.g.:
+#     PS1=""
+#     PROMPT_COMMAND='echo -ne "\033]0;SOME TITLE HERE\007"'
+#   Also:
+#     titlebar="\[\e]0;THIS IS A TEST\a\]"
+#     PROMPT_COMMAND='printf '%b' "${titlebar}\[\033[01;36m\]\u@\[\033[1;33m\]\h\[\033[00m\]:\[\033[01;37m\]\W\[\033[00m\]${prompt_symbol} "'
+
 _hf_prompt_customize_shell_prompt_PS1 () {
   if [ -z "${HOMEFRIES_PS1_ORIG+x}" ]; then
     export HOMEFRIES_PS1_ORIG="$PS1"
@@ -392,28 +414,6 @@ _hf_prompt_customize_shell_prompt_PS1 () {
     # flavor of Linux.
     : # Just use default prompt.
   fi
-
-  # REFER: You can use PROMPT_COMMAND instead to set PS1.
-  # - It's called before every prompt.
-  #   - (Homefries uses it to call `_hist_util_hook_bg`.)
-  # - E.g., if you disable all the `unset -f` calls herein,
-  #   you could set:
-  #     PROMPT_COMMAND=_hf_prompt_customize_shell_prompts_and_window_title
-  #   and it'll set PS1 before every prompt.
-  #   - Though note this runs noticeably slower than the normal
-  #     prompt. Obviously, we could fix the fcns. herein to improve
-  #     performance (e.g., if you just press enter at an empty
-  #     prompt, you'll see a slight lag before the next prompt is
-  #     printed). But I don't see any benefit to using PROMPT_COMMAND,
-  #     as you can already embed code to run before every prompt
-  #     into PS1.
-  # - You can also skip PS1 and echo from the PROMPT_COMMAND
-  #   callback directly, e.g.:
-  #     PS1=""
-  #     PROMPT_COMMAND='echo -ne "\033]0;SOME TITLE HERE\007"'
-  #   Also:
-  #     titlebar="\[\e]0;THIS IS A TEST\a\]"
-  #     PROMPT_COMMAND='printf '%b' "${titlebar}\[\033[01;36m\]\u@\[\033[1;33m\]\h\[\033[00m\]:\[\033[01;37m\]\W\[\033[00m\]${prompt_symbol} "'
 }
 
 # ***
