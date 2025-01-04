@@ -42,7 +42,7 @@ _hf_set_iterm2_window_number_environ () {
   window_number="$(_hf_print_terminal_window_number)"
 
   if [ -n "${window_number}" ]; then
-    if ${DUBS_ALWAYS_ON_VISIBLE:-false} && ! os_is_macos; then
+    if ${DUBS_ALWAYS_ON_VISIBLE:-false} && ! _hf_titler_os_is_macos; then
       # Use a special character so we can grep the title to determine if
       # the mate-terminal window should be made sticky (aka it's kludgy).
       # - CXREF: ~/.kit/sh/home-fries/lib/term/perhaps-always-on-visible-desktop.sh
@@ -176,7 +176,7 @@ _hf_print_terminal_window_number_iterm () {
 
 _hf_print_terminal_window_number_alacritty () {
   # FTREQ/2024-07-10: Try Alacritty on Linux and update this fcn.
-  if ! os_is_macos; then
+  if ! _hf_titler_os_is_macos; then
 
     return 1
   fi
@@ -245,9 +245,17 @@ _hf_print_terminal_window_number_mate_terminal () {
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
+_hf_titler_os_is_macos () {
+  [ "$(uname)" = 'Darwin' ]
+}
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
 _hf_cleanup_lib_term_window_title_show_command_name () {
   unset -f _hf_set_iterm2_window_number_environ
   # Leave set: ITERM2_WINDOW_NUMBER
+
+  unset -f _hf_titler_os_is_macos
 
   unset -f _hf_print_terminal_window_number
   unset -f _hf_print_terminal_window_number_iterm

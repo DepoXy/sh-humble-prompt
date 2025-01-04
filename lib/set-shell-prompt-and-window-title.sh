@@ -6,13 +6,6 @@
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-_hf_check_deps_set_shell_prompt () {
-  # Verify distro_util.sh loaded.
-  check_dep 'os_is_macos' || return $?
-}
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
-
 # USAGE: Configure git-rebase indicator style
 # - 0: Off
 # - 1: Put parentheses around the host icon, e.g., (🍅)
@@ -56,8 +49,8 @@ _hf_prompt_is_user_logged_on_via_ssh () {
 }
 
 _hf_prompt_user_is_not_trapped_in_chroot () {
-  ( os_is_linux && [ $(stat -c %i /) -eq 2 ] ) ||
-  ( os_is_macos && [ $(stat -f %i /) -eq 2 ] )
+  ( _hf_prompt_os_is_linux && [ $(stat -c %i /) -eq 2 ] ) ||
+  ( _hf_prompt_os_is_macos && [ $(stat -f %i /) -eq 2 ] )
 }
 
 _hf_prompt_format_titlebar () {
@@ -179,7 +172,7 @@ _hf_prompt_customize_shell_prompts_and_window_title () {
   #
   local mach_name='\h'
   # (lb): 2020-08-24: At least on Mac I use, hostname is 16-character MAC.
-  os_is_macos && mach_name="$(scutil --get LocalHostName | sed -E 's/(.{8}).*/\1/')"
+  _hf_prompt_os_is_macos && mach_name="$(scutil --get LocalHostName | sed -E 's/(.{8}).*/\1/')"
   mach_name="${HOMEFRIES_TERM_UTIL_PS1_HOST:-${mach_name}}"
   #
   local basename='\W'
@@ -321,11 +314,11 @@ _hf_prompt_customize_shell_prompt_PS1 () {
   # NOTE: Using "" below instead of '' so that ${titlebar} is resolved by the
   #       shell first.
   # ${HOMEFRIES_TRACE} && echo "PS1: Preparing prompt"
-  if [ -e /proc/version ] || os_is_macos ; then
+  if [ -e /proc/version ] || _hf_prompt_os_is_macos ; then
     if [ $EUID -eq 0 ]; then
       local fg_path=""
       # ${HOMEFRIES_TRACE} && echo "PS1: Running as root!"
-      if os_is_macos || [ "$(cat /proc/version | grep Ubuntu)" ]; then
+      if _hf_prompt_os_is_macos || [ "$(cat /proc/version | grep Ubuntu)" ]; then
         # ${HOMEFRIES_TRACE} && echo "PS1: On Ubuntu"
         fg_path="${fg_cyan}"
       elif [ "$(cat /proc/version | grep Red\ Hat)" ]; then
@@ -339,7 +332,7 @@ _hf_prompt_customize_shell_prompt_PS1 () {
         return
       fi
       PS1="${titlebar}${bg_magenta}${fg_gray}${cur_user}@${fg_yellow}${mach_name}${attr_reset}:${fg_path}${basename}${attr_reset}${prompt_symbol} "
-    elif os_is_macos || [ "$(cat /proc/version | grep Ubuntu)" ]; then
+    elif _hf_prompt_os_is_macos || [ "$(cat /proc/version | grep Ubuntu)" ]; then
       # ${HOMEFRIES_TRACE} && echo "PS1: On Ubuntu"
       # 2015.03.04: I need to know when I'm in chroot hell.
       # NOTE: There's a better way using sudo to check if in chroot jail
@@ -434,15 +427,25 @@ home_fries_set_PS4 () {
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
+_hf_prompt_os_is_linux () {
+  [ "$(uname)" = "Linux" ]
+}
+
+_hf_prompt_os_is_macos () {
+  [ "$(uname)" = 'Darwin' ]
+}
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
 # NOTE: This function is a one-off, as it wouldn't be necessary to
 #       call it more than once. So it cleans itself up rather than
 #       hang around the environment.
 
 _hf_prompt_configure () {
-  _hf_check_deps_set_shell_prompt || return $?
-  unset -f _hf_check_deps_set_shell_prompt
-
   _hf_prompt_customize_shell_prompts_and_window_title
+
+  unset -f _hf_prompt_os_is_linux
+  unset -f _hf_prompt_os_is_macos
 
   unset -f _hf_prompt_is_user_logged_on_via_ssh
   unset -f _hf_prompt_user_is_not_trapped_in_chroot
