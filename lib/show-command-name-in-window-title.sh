@@ -188,12 +188,12 @@ _hf_print_terminal_window_number_alacritty () {
 
   local window_number=""
 
-  local lib_term_dir
-  lib_term_dir="$(dirname -- "${BASH_SOURCE[0]}")"
+  local sh_humble_prompt_lib_dir
+  sh_humble_prompt_lib_dir="$(dirname -- "${BASH_SOURCE[0]}")"
 
   local osa_path
-  # CXREF: ~/.kit/sh/home-fries/lib/term/window-title--alacritty-number.osa
-  osa_path="${lib_term_dir}/window-title--alacritty-number.osa"
+  # CXREF: ~/.kit/sh/sh-humble-prompt/lib/window-title--alacritty-number.osa
+  osa_path="${sh_humble_prompt_lib_dir}/window-title--alacritty-number.osa"
 
   window_number="$(osascript "${osa_path}")"
 

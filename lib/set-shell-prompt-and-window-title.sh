@@ -109,16 +109,16 @@ _hf_prompt_format_titlebar () {
 
   local winnum="${ITERM2_WINDOW_NUMBER}"
 
-  # - CXREF: ~/.kit/sh/home-fries/lib/term/show-command-name-in-window-title.sh
-  local lib_term_dir
-  lib_term_dir="$(dirname -- "${BASH_SOURCE[0]}")"
+  # - CXREF: ~/.kit/sh/sh-humble-prompt/lib/show-command-name-in-window-title.sh
+  local sh_humble_prompt_lib_dir
+  sh_humble_prompt_lib_dir="$(dirname -- "${BASH_SOURCE[0]}")"
   #
   local basename
   # HSTRY/2024-06-25: Previously just showed working directory basename:
   #   basename="\W"
   # - But we can use a function callback to get crafty with the path text.
-  # CXREF: ~/.kit/sh/home-fries/lib/term/window-title--fancy-cwd-path
-  basename='$('"${lib_term_dir}"'/window-title--fancy-cwd-path)'
+  # CXREF: ~/.kit/sh/sh-humble-prompt/lib/window-title--fancy-cwd-path
+  basename='$('"${sh_humble_prompt_lib_dir}"'/window-title--fancy-cwd-path)'
 
   local endof_osc='\a'
 
