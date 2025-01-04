@@ -438,7 +438,7 @@ home_fries_set_PS4 () {
 #       call it more than once. So it cleans itself up rather than
 #       hang around the environment.
 
-_hf_set_terminal_prompt () {
+_hf_prompt_configure () {
   _hf_check_deps_set_shell_prompt || return $?
   unset -f _hf_check_deps_set_shell_prompt
 
