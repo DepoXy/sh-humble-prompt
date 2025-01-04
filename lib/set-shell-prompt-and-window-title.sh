@@ -495,6 +495,9 @@ _hf_prompt_configure () {
   unset -f _hf_prompt_user_is_not_trapped_in_chroot
   unset -f _hf_prompt_format_titlebar
 
+  unset -f _hf_prompt_customize_shell_prompt_PS1
+  unset -f _hf_prompt_customize_shell_prompt_PS2
+
   unset -f _hf_prompt_customize_shell_prompts_and_window_title
 
   unset -f _hf_prompt_configure

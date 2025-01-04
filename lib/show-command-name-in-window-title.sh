@@ -31,6 +31,10 @@ _hf_hook_titlebar_update () {
   # basename of the directory when the prompt is active, but shows the name
   # of the actively running command if there is one, e.g., `man bash`.
   trap 'printf "\033]0;%s\007" "${ITERM2_WINDOW_NUMBER}${BASH_COMMAND}"' DEBUG
+
+  # This is a one-off script: Source it, then call _hf_hook_titlebar_update,
+  # and it'll unset the functions it no longer needs.
+  _hf_cleanup_lib_term_window_title_show_command_name
 }
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -261,6 +265,8 @@ _hf_cleanup_lib_term_window_title_show_command_name () {
   unset -f _hf_print_terminal_window_number_iterm
   unset -f _hf_print_terminal_window_number_alacritty
   unset -f _hf_print_terminal_window_number_mate_terminal
+
+  unset -f _hf_hook_titlebar_update
 
   unset -f _hf_cleanup_lib_term_window_title_show_command_name
 }
