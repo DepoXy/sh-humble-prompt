@@ -169,12 +169,18 @@ _hf_prompt_customize_shell_prompts_and_window_title () {
   local attr_reset='\[\033[00m\]'
   local attr_underlined="\033[4m"
   # local attr_bold="\[\033[1m\]"  # See also: $(tput bold).
-  #
-  local mach_name='\h'
-  # (lb): 2020-08-24: At least on Mac I use, hostname is 16-character MAC.
-  _hf_prompt_os_is_macos && mach_name="$(scutil --get LocalHostName | sed -E 's/(.{8}).*/\1/')"
-  mach_name="${HOMEFRIES_TERM_UTIL_PS1_HOST:-${mach_name}}"
-  #
+
+  local mach_name
+  if [ -n "${HOMEFRIES_TERM_UTIL_PS1_HOST}" ]; then
+    mach_name="${HOMEFRIES_TERM_UTIL_PS1_HOST}"
+  elif _hf_prompt_os_is_macos; then
+    # (lb): 2020-08-24: On Vendor's Mac I use, hostname is 16-character MAC.
+    # - Short hostname to 8 characters, in case it's just the MAC.
+    mach_name="$(scutil --get LocalHostName | sed -E 's/(.{8}).*/\1/')"
+  else
+    mach_name='\h'
+  fi
+
   local basename='\W'
 
   # Configure a colorful prompt of the following format:
