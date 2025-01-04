@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # vim:tw=0:ts=2:sw=2:et:norl:ft=bash
-# Author: Landon Bouma (landonb &#x40; retrosoft &#x2E; com)
-# Project: https://github.com/landonb/home-fries#🍟
+# Author: Landon Bouma <https://tallybark.com/>
+# Project: https://github.com/DepoXy/sh-humble-prompt#🙇
 # License: MIT
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
