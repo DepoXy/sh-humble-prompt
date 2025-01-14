@@ -387,22 +387,20 @@ _hf_prompt_customize_shell_prompt_PS1 () {
   if [ $EUID -eq 0 ]; then
     # ${HOMEFRIES_TRACE} && echo "PS1: As root"
     PS1="${titlebar}${bg_magenta}${fg_gray}${cur_user}@${fg_yellow}${mach_name}${attr_reset}${unicolon}${fg_cyan}${basename}${attr_reset}${prompt_symbol} "
+  elif _hf_prompt_is_user_logged_on_via_ssh; then
+    # ${HOMEFRIES_TRACE} && echo "PS1: Via SSH"
+    # 2018-12-23: Use remote_shell_icon when logged on over SSH.
+    PS1="${titlebar}${fg_gray}${cur_user}$(attr_italic)$(attr_underline)$(fg_lightorange)@${mach_name}${attr_reset}${unicolon}${fg_cyan}${basename}${attr_reset} ${remote_shell_icon}${prompt_symbol} "
+  elif _hf_prompt_user_is_not_trapped_in_chroot; then
+    # ${HOMEFRIES_TRACE} && echo "PS1: Local shell"
+    PS1="${titlebar}${fg_gray}${cur_user}@${fg_yellow}${mach_name}${attr_reset}${unicolon}${fg_cyan}${basename}${attr_reset} ${local_shell_icon}${prompt_symbol} "
+    # 2015.02.26: Add git branch.
+    #             Maybe... not sure I like this...
+    #             maybe change delimiter and make branch name colorful?
+    #  PS1="${titlebar}\[\033[01;37m\]\u@\[\033[1;33m\]\h\[\033[00m\]:\[\033[01;36m\]\W\[\033[00m\]"'$(__git_ps1 "-%s" )${prompt_symbol} '
   else
-    if _hf_prompt_is_user_logged_on_via_ssh; then
-      # ${HOMEFRIES_TRACE} && echo "PS1: Via SSH"
-      # 2018-12-23: Use remote_shell_icon when logged on over SSH.
-      PS1="${titlebar}${fg_gray}${cur_user}$(attr_italic)$(attr_underline)$(fg_lightorange)@${mach_name}${attr_reset}${unicolon}${fg_cyan}${basename}${attr_reset} ${remote_shell_icon}${prompt_symbol} "
-    elif _hf_prompt_user_is_not_trapped_in_chroot; then
-      # ${HOMEFRIES_TRACE} && echo "PS1: Local shell"
-      PS1="${titlebar}${fg_gray}${cur_user}@${fg_yellow}${mach_name}${attr_reset}${unicolon}${fg_cyan}${basename}${attr_reset} ${local_shell_icon}${prompt_symbol} "
-      # 2015.02.26: Add git branch.
-      #             Maybe... not sure I like this...
-      #             maybe change delimiter and make branch name colorful?
-      #  PS1="${titlebar}\[\033[01;37m\]\u@\[\033[1;33m\]\h\[\033[00m\]:\[\033[01;36m\]\W\[\033[00m\]"'$(__git_ps1 "-%s" )${prompt_symbol} '
-    else
-      # ${HOMEFRIES_TRACE} && echo "PS1: Chroot"
-      PS1="${titlebar}${fg_red}**${cur_user}@**${fg_cyan}${mach_name}${attr_reset}${unicolon}${fg_yellow}${basename}${attr_reset} "'! '
-    fi
+    # ${HOMEFRIES_TRACE} && echo "PS1: Chroot"
+    PS1="${titlebar}${fg_red}**${cur_user}@**${fg_cyan}${mach_name}${attr_reset}${unicolon}${fg_yellow}${basename}${attr_reset} "'! '
   fi
 
   if [ ${HOMEFRIES_PS1_PREV_CMD_FAILED_STYLE:-0} -eq 1 ]; then
