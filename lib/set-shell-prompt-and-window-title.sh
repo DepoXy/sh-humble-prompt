@@ -393,8 +393,6 @@ _hf_prompt_customize_shell_prompt_PS1 () {
 
   # ***
 
-  # NOTE: Using "" below instead of '' so that ${titlebar} is resolved by the
-  #       shell first.
   # ${HOMEFRIES_TRACE} && echo "PS1: Preparing prompt"
   if ${os_is_macos_or_debian_flavor}; then
     if [ $EUID -eq 0 ]; then
