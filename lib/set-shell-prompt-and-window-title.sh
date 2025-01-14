@@ -376,17 +376,34 @@ _hf_prompt_customize_shell_prompt_PS1 () {
     #   prompt_symbol="\$(test \${_hf_exitcode:-0} -ne 0 && echo \"${fg_red}${prompt_symbol}${attr_reset}\" || echo \"${prompt_symbol}\")"
   fi
 
+  # ***
+
+  local os_is_macos_or_debian_flavor=false
+  local os_is_red_hat_flavor=false
+
+  if _hf_prompt_os_is_macos; then
+    os_is_macos_or_debian_flavor=true
+  elif [ -e /etc/os-release ]; then
+    if cat /etc/os-release | grep -q "^ID=\(debian\|linuxmint\|ubuntu\)\$"; then
+      os_is_macos_or_debian_flavor=true
+    elif cat /etc/os-release | grep -q "^ID=\(fedora\|rhel\)\$"; then
+      os_is_red_hat_flavor=true
+    fi
+  fi
+
+  # ***
+
   # NOTE: Using "" below instead of '' so that ${titlebar} is resolved by the
   #       shell first.
   # ${HOMEFRIES_TRACE} && echo "PS1: Preparing prompt"
-  if [ -e /proc/version ] || _hf_prompt_os_is_macos ; then
+  if ${os_is_macos_or_debian_flavor}; then
     if [ $EUID -eq 0 ]; then
       local fg_path=""
       # ${HOMEFRIES_TRACE} && echo "PS1: Running as root"
-      if _hf_prompt_os_is_macos || [ "$(cat /proc/version | grep Ubuntu)" ]; then
+      if ${os_is_macos_or_debian_flavor}; then
         # ${HOMEFRIES_TRACE} && echo "PS1: On Ubuntu"
         fg_path="${fg_cyan}"
-      elif [ "$(cat /proc/version | grep Red\ Hat)" ]; then
+      elif ${os_is_red_hat_flavor}; then
         # ${HOMEFRIES_TRACE} && echo "PS1: On Red Hat"
         # - DUNNO/2024-05-01: I don't recall history of this path (and
         #   it's been eons since I last used Fedora).
@@ -397,7 +414,7 @@ _hf_prompt_customize_shell_prompt_PS1 () {
         return 1
       fi
       PS1="${titlebar}${bg_magenta}${fg_gray}${cur_user}@${fg_yellow}${mach_name}${attr_reset}${unicolon}${fg_path}${basename}${attr_reset}${prompt_symbol} "
-    elif _hf_prompt_os_is_macos || [ "$(cat /proc/version | grep Ubuntu)" ]; then
+    elif ${os_is_macos_or_debian_flavor}; then
       # ${HOMEFRIES_TRACE} && echo "PS1: On Ubuntu"
       if _hf_prompt_is_user_logged_on_via_ssh; then
         # 2018-12-23: Use remote_shell_icon when logged on over SSH.
@@ -412,7 +429,7 @@ _hf_prompt_customize_shell_prompt_PS1 () {
       else
         PS1="${titlebar}${fg_red}**${cur_user}@**${fg_cyan}${mach_name}${attr_reset}${unicolon}${fg_yellow}${basename}${attr_reset} "'! '
       fi
-    elif [ "$(cat /proc/version | grep Red\ Hat)" ]; then
+    elif ${os_is_red_hat_flavor}; then
       # ${HOMEFRIES_TRACE} && echo "PS1: On Red Hat"
 
       PS1="${titlebar}${fg_cyan}${cur_user}@${fg_yellow}${mach_name}${attr_reset}${unicolon}${fg_gray}${basename}${attr_reset}${prompt_symbol} "
