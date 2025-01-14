@@ -181,6 +181,17 @@ _hf_prompt_customize_shell_prompts_and_window_title () {
   local attr_underlined="\033[4m"
   # local attr_bold="\[\033[1m\]"  # See also: $(tput bold).
 
+  # So that you can double-click the working directory to copy it, use
+  # non-path characters before and after the path.
+  # - The set of path characters is specific to the terminal emulator,
+  #   and it's not always adjustable (without building from sources, I
+  #   suppose).
+  # - Whitespace and Unicode should be universally accepted as not path
+  #   characters.
+  #   - E.g., rather than use an ASCII colon ":", use a Unicode colon "∶".
+  #     - REFER: "Ratio", Unicode Character “∶” (U+2236)
+  local unicolon="∶"
+
   local mach_name
   if [ -n "${HOMEFRIES_TERM_UTIL_PS1_HOST}" ]; then
     mach_name="${HOMEFRIES_TERM_UTIL_PS1_HOST}"
@@ -385,32 +396,26 @@ _hf_prompt_customize_shell_prompt_PS1 () {
 
         return 1
       fi
-      PS1="${titlebar}${bg_magenta}${fg_gray}${cur_user}@${fg_yellow}${mach_name}${attr_reset}:${fg_path}${basename}${attr_reset}${prompt_symbol} "
+      PS1="${titlebar}${bg_magenta}${fg_gray}${cur_user}@${fg_yellow}${mach_name}${attr_reset}${unicolon}${fg_path}${basename}${attr_reset}${prompt_symbol} "
     elif _hf_prompt_os_is_macos || [ "$(cat /proc/version | grep Ubuntu)" ]; then
       # ${HOMEFRIES_TRACE} && echo "PS1: On Ubuntu"
       if _hf_prompt_is_user_logged_on_via_ssh; then
         # 2018-12-23: Use remote_shell_icon when logged on over SSH.
 
-        PS1="${titlebar}${fg_gray}${cur_user}$(attr_italic)$(attr_underline)$(fg_lightorange)@${mach_name}${attr_reset}:${fg_cyan}${basename}${attr_reset} ${remote_shell_icon} ${prompt_symbol} "
+        PS1="${titlebar}${fg_gray}${cur_user}$(attr_italic)$(attr_underline)$(fg_lightorange)@${mach_name}${attr_reset}${unicolon}${fg_cyan}${basename}${attr_reset} ${remote_shell_icon} ${prompt_symbol} "
       elif _hf_prompt_user_is_not_trapped_in_chroot; then
-        # With a colon between hostname and working directory:
-        #   PS1="${titlebar}${fg_gray}${cur_user}@${fg_yellow}${mach_name}${attr_reset}:${fg_cyan}${basename}${attr_reset} ${local_shell_icon} ${prompt_symbol} "
-        # With a space between hostname and working directory, so double-click works.
-        #   PS1="${titlebar}${fg_gray}${cur_user}@${fg_yellow}${mach_name}${attr_reset} ${fg_cyan}${basename}${attr_reset} ${local_shell_icon} ${prompt_symbol} "
-        # With a Unicode colon between hostname and working directory, so double-click works.
-
-        PS1="${titlebar}${fg_gray}${cur_user}@${fg_yellow}${mach_name}${attr_reset}∶${fg_cyan}${basename}${attr_reset} ${local_shell_icon} ${prompt_symbol} "
+        PS1="${titlebar}${fg_gray}${cur_user}@${fg_yellow}${mach_name}${attr_reset}${unicolon}${fg_cyan}${basename}${attr_reset} ${local_shell_icon} ${prompt_symbol} "
         # 2015.02.26: Add git branch.
         #             Maybe... not sure I like this...
         #             maybe change delimiter and make branch name colorful?
         #PS1="${titlebar}\[\033[01;37m\]\u@\[\033[1;33m\]\h\[\033[00m\]:\[\033[01;36m\]\W\[\033[00m\]"'$(__git_ps1 "-%s" )${prompt_symbol} '
       else
-        PS1="${titlebar}${fg_red}**${cur_user}@**${fg_cyan}${mach_name}${attr_reset}:${fg_yellow}${basename}${attr_reset} "'! '
+        PS1="${titlebar}${fg_red}**${cur_user}@**${fg_cyan}${mach_name}${attr_reset}${unicolon}${fg_yellow}${basename}${attr_reset} "'! '
       fi
     elif [ "$(cat /proc/version | grep Red\ Hat)" ]; then
       # ${HOMEFRIES_TRACE} && echo "PS1: On Red Hat"
 
-      PS1="${titlebar}${fg_cyan}${cur_user}@${fg_yellow}${mach_name}${attr_reset}:${fg_gray}${basename}${attr_reset}${prompt_symbol} "
+      PS1="${titlebar}${fg_cyan}${cur_user}@${fg_yellow}${mach_name}${attr_reset}${unicolon}${fg_gray}${basename}${attr_reset}${prompt_symbol} "
     else
       >&2 echo "ERROR: Unsupported OS / Cannot (well, will not) set PS1"
 
