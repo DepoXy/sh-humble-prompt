@@ -295,6 +295,9 @@ _hf_prompt_customize_shell_prompts_and_window_title () {
     remote_shell_icon='$([ -f "$(git root 2> /dev/null)/.git/rebase-merge/git-rebase-todo" ] && echo "('"${remote_shell_icon}"')" || echo "'"${remote_shell_icon}"'")'
   fi
 
+  local_shell_icon="${local_shell_icon} "
+  remote_shell_icon="${remote_shell_icon} "
+
   _hf_prompt_customize_shell_prompt_PS1
   _hf_prompt_customize_shell_prompt_PS2
 }
@@ -376,70 +379,30 @@ _hf_prompt_customize_shell_prompt_PS1 () {
     #   prompt_symbol="\$(test \${_hf_exitcode:-0} -ne 0 && echo \"${fg_red}${prompt_symbol}${attr_reset}\" || echo \"${prompt_symbol}\")"
   fi
 
-  # ***
-
-  local os_is_macos_or_debian_flavor=false
-  local os_is_red_hat_flavor=false
-
-  if _hf_prompt_os_is_macos; then
-    os_is_macos_or_debian_flavor=true
-  elif [ -e /etc/os-release ]; then
-    if cat /etc/os-release | grep -q "^ID=\(debian\|linuxmint\|ubuntu\)\$"; then
-      os_is_macos_or_debian_flavor=true
-    elif cat /etc/os-release | grep -q "^ID=\(fedora\|rhel\)\$"; then
-      os_is_red_hat_flavor=true
-    fi
+  if ${HOMEFRIES_PS1_EMOJI_DISABLE:-false}; then
+    local_shell_icon=""
+    remote_shell_icon=""
   fi
 
-  # ***
-
-  # ${HOMEFRIES_TRACE} && echo "PS1: Preparing prompt"
-  if ${os_is_macos_or_debian_flavor}; then
-    if [ $EUID -eq 0 ]; then
-      local fg_path=""
-      # ${HOMEFRIES_TRACE} && echo "PS1: Running as root"
-      if ${os_is_macos_or_debian_flavor}; then
-        # ${HOMEFRIES_TRACE} && echo "PS1: On Ubuntu"
-        fg_path="${fg_cyan}"
-      elif ${os_is_red_hat_flavor}; then
-        # ${HOMEFRIES_TRACE} && echo "PS1: On Red Hat"
-        # - DUNNO/2024-05-01: I don't recall history of this path (and
-        #   it's been eons since I last used Fedora).
-        fg_path="${fg_gray}"
-      else
-        >&2 echo "ERROR: Unsupported OS / Cannot (well, will not) set PS1"
-
-        return 1
-      fi
-      PS1="${titlebar}${bg_magenta}${fg_gray}${cur_user}@${fg_yellow}${mach_name}${attr_reset}${unicolon}${fg_path}${basename}${attr_reset}${prompt_symbol} "
-    elif ${os_is_macos_or_debian_flavor}; then
-      # ${HOMEFRIES_TRACE} && echo "PS1: On Ubuntu"
-      if _hf_prompt_is_user_logged_on_via_ssh; then
-        # 2018-12-23: Use remote_shell_icon when logged on over SSH.
-
-        PS1="${titlebar}${fg_gray}${cur_user}$(attr_italic)$(attr_underline)$(fg_lightorange)@${mach_name}${attr_reset}${unicolon}${fg_cyan}${basename}${attr_reset} ${remote_shell_icon} ${prompt_symbol} "
-      elif _hf_prompt_user_is_not_trapped_in_chroot; then
-        PS1="${titlebar}${fg_gray}${cur_user}@${fg_yellow}${mach_name}${attr_reset}${unicolon}${fg_cyan}${basename}${attr_reset} ${local_shell_icon} ${prompt_symbol} "
-        # 2015.02.26: Add git branch.
-        #             Maybe... not sure I like this...
-        #             maybe change delimiter and make branch name colorful?
-        #  PS1="${titlebar}\[\033[01;37m\]\u@\[\033[1;33m\]\h\[\033[00m\]:\[\033[01;36m\]\W\[\033[00m\]"'$(__git_ps1 "-%s" )${prompt_symbol} '
-      else
-        PS1="${titlebar}${fg_red}**${cur_user}@**${fg_cyan}${mach_name}${attr_reset}${unicolon}${fg_yellow}${basename}${attr_reset} "'! '
-      fi
-    elif ${os_is_red_hat_flavor}; then
-      # ${HOMEFRIES_TRACE} && echo "PS1: On Red Hat"
-
-      PS1="${titlebar}${fg_cyan}${cur_user}@${fg_yellow}${mach_name}${attr_reset}${unicolon}${fg_gray}${basename}${attr_reset}${prompt_symbol} "
-    else
-      >&2 echo "ERROR: Unsupported OS / Cannot (well, will not) set PS1"
-
-      return 1
-    fi
+  if [ $EUID -eq 0 ]; then
+    # ${HOMEFRIES_TRACE} && echo "PS1: As root"
+    PS1="${titlebar}${bg_magenta}${fg_gray}${cur_user}@${fg_yellow}${mach_name}${attr_reset}${unicolon}${fg_cyan}${basename}${attr_reset}${prompt_symbol} "
   else
-    # This is a chroot jail without a mounted /proc, or some other
-    # flavor of Linux.
-    : # Just use default prompt.
+    if _hf_prompt_is_user_logged_on_via_ssh; then
+      # ${HOMEFRIES_TRACE} && echo "PS1: Via SSH"
+      # 2018-12-23: Use remote_shell_icon when logged on over SSH.
+      PS1="${titlebar}${fg_gray}${cur_user}$(attr_italic)$(attr_underline)$(fg_lightorange)@${mach_name}${attr_reset}${unicolon}${fg_cyan}${basename}${attr_reset} ${remote_shell_icon}${prompt_symbol} "
+    elif _hf_prompt_user_is_not_trapped_in_chroot; then
+      # ${HOMEFRIES_TRACE} && echo "PS1: Local shell"
+      PS1="${titlebar}${fg_gray}${cur_user}@${fg_yellow}${mach_name}${attr_reset}${unicolon}${fg_cyan}${basename}${attr_reset} ${local_shell_icon}${prompt_symbol} "
+      # 2015.02.26: Add git branch.
+      #             Maybe... not sure I like this...
+      #             maybe change delimiter and make branch name colorful?
+      #  PS1="${titlebar}\[\033[01;37m\]\u@\[\033[1;33m\]\h\[\033[00m\]:\[\033[01;36m\]\W\[\033[00m\]"'$(__git_ps1 "-%s" )${prompt_symbol} '
+    else
+      # ${HOMEFRIES_TRACE} && echo "PS1: Chroot"
+      PS1="${titlebar}${fg_red}**${cur_user}@**${fg_cyan}${mach_name}${attr_reset}${unicolon}${fg_yellow}${basename}${attr_reset} "'! '
+    fi
   fi
 
   if [ ${HOMEFRIES_PS1_PREV_CMD_FAILED_STYLE:-0} -eq 1 ]; then
