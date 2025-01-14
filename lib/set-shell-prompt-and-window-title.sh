@@ -371,7 +371,7 @@ _hf_prompt_customize_shell_prompt_PS1 () {
   if [ -e /proc/version ] || _hf_prompt_os_is_macos ; then
     if [ $EUID -eq 0 ]; then
       local fg_path=""
-      # ${HOMEFRIES_TRACE} && echo "PS1: Running as root!"
+      # ${HOMEFRIES_TRACE} && echo "PS1: Running as root"
       if _hf_prompt_os_is_macos || [ "$(cat /proc/version | grep Ubuntu)" ]; then
         # ${HOMEFRIES_TRACE} && echo "PS1: On Ubuntu"
         fg_path="${fg_cyan}"
