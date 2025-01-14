@@ -53,6 +53,12 @@ _hf_prompt_is_user_logged_on_via_ssh () {
   return 1
 }
 
+# 2015.03.04: I need to know when I'm in chroot hell.
+# NOTE: There's a better way using sudo to check if in chroot jail
+#       (which is compatible with Mac, BSD, etc.) but we don't want
+#       to use sudo, and we know we're on Linux. And on Linux,
+#       the inode of the (outermost) root directory is always 2.
+
 _hf_prompt_user_is_not_trapped_in_chroot () {
   ( _hf_prompt_os_is_linux && [ $(stat -c %i /) -eq 2 ] ) ||
   ( _hf_prompt_os_is_macos && [ $(stat -f %i /) -eq 2 ] )
@@ -380,12 +386,6 @@ _hf_prompt_customize_shell_prompt_PS1 () {
       PS1="${titlebar}${bg_magenta}${fg_gray}${cur_user}@${fg_yellow}${mach_name}${attr_reset}:${fg_path}${basename}${attr_reset}${prompt_symbol} "
     elif _hf_prompt_os_is_macos || [ "$(cat /proc/version | grep Ubuntu)" ]; then
       # ${HOMEFRIES_TRACE} && echo "PS1: On Ubuntu"
-      # 2015.03.04: I need to know when I'm in chroot hell.
-      # NOTE: There's a better way using sudo to check if in chroot jail
-      #       (which is compatible with Mac, BSD, etc.) but we don't want
-      #       to use sudo, and we know we're on Linux. And on Linux,
-      #       the inode of the (outermost) root directory is always 2.
-      # CAVEAT: This check works on Linux but probably not on Mac, BSD, Cygwin, etc.
       if _hf_prompt_is_user_logged_on_via_ssh; then
         # 2018-12-23: Killer.
 
