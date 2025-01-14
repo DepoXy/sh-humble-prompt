@@ -109,7 +109,7 @@ _hf_print_terminal_window_number () {
 
   false \
     || window_number="$(_hf_print_terminal_window_number_iterm)" \
-    || window_number="$(_hf_print_terminal_window_number_alacritty)" \
+    || window_number="$(_hf_print_terminal_window_number_alacritty_macos)" \
     || window_number="$(_hf_print_terminal_window_number_mate_terminal)" \
     || true;
 
@@ -178,7 +178,7 @@ _hf_print_terminal_window_number_iterm () {
 #   windows. But parts of the border that overlap other apps or
 #   the Finder are still borderful (drawn).
 
-_hf_print_terminal_window_number_alacritty () {
+_hf_print_terminal_window_number_alacritty_macos () {
   # FTREQ/2024-07-10: Try Alacritty on Linux and update this fcn.
   if ! _hf_titler_os_is_macos; then
 
@@ -263,7 +263,7 @@ _hf_cleanup_lib_term_window_title_show_command_name () {
 
   unset -f _hf_print_terminal_window_number
   unset -f _hf_print_terminal_window_number_iterm
-  unset -f _hf_print_terminal_window_number_alacritty
+  unset -f _hf_print_terminal_window_number_alacritty_macos
   unset -f _hf_print_terminal_window_number_mate_terminal
 
   unset -f _hf_hook_titlebar_update
