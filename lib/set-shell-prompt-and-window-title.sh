@@ -387,7 +387,7 @@ _hf_prompt_customize_shell_prompt_PS1 () {
     elif _hf_prompt_os_is_macos || [ "$(cat /proc/version | grep Ubuntu)" ]; then
       # ${HOMEFRIES_TRACE} && echo "PS1: On Ubuntu"
       if _hf_prompt_is_user_logged_on_via_ssh; then
-        # 2018-12-23: Killer.
+        # 2018-12-23: Use remote_shell_icon when logged on over SSH.
 
         PS1="${titlebar}${fg_gray}${cur_user}$(attr_italic)$(attr_underline)$(fg_lightorange)@${mach_name}${attr_reset}:${fg_cyan}${basename}${attr_reset} ${remote_shell_icon} ${prompt_symbol} "
       elif _hf_prompt_user_is_not_trapped_in_chroot; then
