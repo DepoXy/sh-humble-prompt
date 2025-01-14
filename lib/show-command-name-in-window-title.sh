@@ -110,7 +110,7 @@ _hf_print_terminal_window_number () {
   false \
     || window_number="$(_hf_print_terminal_window_number_iterm)" \
     || window_number="$(_hf_print_terminal_window_number_alacritty_macos)" \
-    || window_number="$(_hf_print_terminal_window_number_mate_terminal)" \
+    || window_number="$(_hf_print_terminal_window_number_linux_terminal)" \
     || true;
 
   printf "%s" "${window_number}"
@@ -214,7 +214,7 @@ _hf_print_terminal_window_number_alacritty_macos () {
 # It's unlikely another application is also prefixing numbers to
 # their window titles, though, we're just that special).
 
-_hf_print_terminal_window_number_mate_terminal () {
+_hf_print_terminal_window_number_linux_terminal () {
   if [ -z "${DISPLAY}" ] || ! command -v wmctrl > /dev/null; then
 
     return 1
@@ -264,7 +264,7 @@ _hf_cleanup_lib_term_window_title_show_command_name () {
   unset -f _hf_print_terminal_window_number
   unset -f _hf_print_terminal_window_number_iterm
   unset -f _hf_print_terminal_window_number_alacritty_macos
-  unset -f _hf_print_terminal_window_number_mate_terminal
+  unset -f _hf_print_terminal_window_number_linux_terminal
 
   unset -f _hf_hook_titlebar_update
 
