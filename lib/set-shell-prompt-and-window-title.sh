@@ -392,7 +392,7 @@ _hf_prompt_customize_shell_prompt_PS1 () {
         PS1="${titlebar}${fg_gray}${cur_user}$(attr_italic)$(attr_underline)$(fg_lightorange)@${mach_name}${attr_reset}:${fg_cyan}${basename}${attr_reset} ${remote_shell_icon} ${prompt_symbol} "
       elif _hf_prompt_user_is_not_trapped_in_chroot; then
         #PS1="${titlebar}\[\033[01;37m\]\u@\[\033[1;33m\]\h\[\033[00m\]:\[\033[01;36m\]\W\[\033[00m\]${prompt_symbol} "
-        # 2015.03.04: The chroot is Ubuntu 12.04, and it's Bash v4.2 does not
+        # 2015.03.04: The chroot is Ubuntu 12.04, and its Bash v4.2 does not
         #             support Unicode \uXXXX escapes, so use the escape in the
         #             outer. (Follow the directory path with an anchor symbol
         #             so I know I'm *not* in the chroot.)
