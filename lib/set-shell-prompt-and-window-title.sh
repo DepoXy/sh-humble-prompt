@@ -237,6 +237,8 @@ _hf_prompt_customize_shell_prompts_and_window_title () {
   #         (though latest Bash `echo` and `printf` do not care).
   # - NOTE: If set in PS1 directly, need to $'interpolate', e.g.,
   #           PS1="${titlebar}${prompt_stuff}"$' \U1F480 '"\$ "
+  #         - SAVVY: Bash's $'...' sees \uXXXX unicode espace
+  #           sequences, but not $"..."
   # - NOTE: And now that I've noted all of this, It's actually
   #         easier to just embed the Unicode within this file.
   #         And then raw macOS (with system Bash 3.x, whose `echo`
@@ -391,11 +393,6 @@ _hf_prompt_customize_shell_prompt_PS1 () {
 
         PS1="${titlebar}${fg_gray}${cur_user}$(attr_italic)$(attr_underline)$(fg_lightorange)@${mach_name}${attr_reset}:${fg_cyan}${basename}${attr_reset} ${remote_shell_icon} ${prompt_symbol} "
       elif _hf_prompt_user_is_not_trapped_in_chroot; then
-        #PS1="${titlebar}\[\033[01;37m\]\u@\[\033[1;33m\]\h\[\033[00m\]:\[\033[01;36m\]\W\[\033[00m\]${prompt_symbol} "
-        # 2015.03.04: The chroot is Ubuntu 12.04, and its Bash v4.2 does not
-        #             support Unicode \uXXXX escapes, so use the escape in the
-        #             outer. (Follow the directory path with an anchor symbol
-        #             so I know I'm *not* in the chroot.)
         # With a colon between hostname and working directory:
         #   PS1="${titlebar}${fg_gray}${cur_user}@${fg_yellow}${mach_name}${attr_reset}:${fg_cyan}${basename}${attr_reset} ${local_shell_icon} ${prompt_symbol} "
         # With a space between hostname and working directory, so double-click works.
@@ -408,14 +405,6 @@ _hf_prompt_customize_shell_prompt_PS1 () {
         #             maybe change delimiter and make branch name colorful?
         #PS1="${titlebar}\[\033[01;37m\]\u@\[\033[1;33m\]\h\[\033[00m\]:\[\033[01;36m\]\W\[\033[00m\]"'$(__git_ps1 "-%s" )${prompt_symbol} '
       else
-        # NOTE: Bash's $'...' sees \uXXXX unicode espace sequences, but not $"..."
-        # See the Unicode character table: http://unicode-table.com/en/
-        # Bash doesn't support all Unicode characters, so see also this list:
-        #   https://mkaz.com/2014/04/17/the-bash-prompt/
-        #PS1="${titlebar}\[\033[01;31m\]"$'\u2605'"\u@"$'\u2605'"\[\033[1;36m\]\h\[\033[00m\]:\[\033[01;33m\]\W\[\033[00m\]"$' \u2693 '
-        # 2015.03.04: As mentioned above, the chroot may be running an old Bash,
-        #             so use the Unicode \uXXXX escape in the outer only.
-
         PS1="${titlebar}${fg_red}**${cur_user}@**${fg_cyan}${mach_name}${attr_reset}:${fg_yellow}${basename}${attr_reset} "'! '
       fi
     elif [ "$(cat /proc/version | grep Red\ Hat)" ]; then
