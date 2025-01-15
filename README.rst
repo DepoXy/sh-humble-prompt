@@ -80,3 +80,17 @@ Window title features:
 - When executing a command, prints the command name in the
   window title.
 
+############
+Dependencies
+############
+
+For Wayland support, install ``window-calls`` GNOME Shell extension:
+
+https://extensions.gnome.org/extension/4724/window-calls/
+
+https://github.com/ickyicky/window-calls
+
+- The ``window-calls`` extension lets this project get a list of window
+  titles, so that it can determine the next window number to use for
+  each new terminal window (which enables the terminal window hotkeys).
+
