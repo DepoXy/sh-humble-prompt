@@ -94,3 +94,15 @@ https://github.com/ickyicky/window-calls
   titles, so that it can determine the next window number to use for
   each new terminal window (which enables the terminal window hotkeys).
 
+- E.g., if you want to list window titles, try::
+
+    gdbus call --session --dest org.gnome.Shell \
+      --object-path /org/gnome/Shell/Extensions/Windows \
+      --method org.gnome.Shell.Extensions.Windows.List
+
+- Note that ``window-calls`` is a great replacement for X Window functionality
+  you'd access via ``wmctrl`` or ``xdotool``.
+
+  - Or, if you're a macOS user, ``window-calls`` enables a lot of functionality
+    you might instead access using `Hammerspoon <https://www.hammerspoon.org/>`__.
+
