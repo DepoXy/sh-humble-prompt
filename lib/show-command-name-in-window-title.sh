@@ -317,6 +317,16 @@ _hf_print_terminal_window_title_prefixes_Wayland () {
   # - Use awk to print only the first column, e.g.,
   #   '1.', '2.', etc.
 
+  # REFER: See comments in DepoXy re: How to deal with escapes:
+  #   https://github.com/DepoXy/depoxy#🍯
+  #     ~/.depoxy/ambers/bin/windows/toggle-visibility
+  # - Removing escape characters before quotes usually works:
+  #     | sed 's/\\"/"/g' \
+  #   But sometimes the response is doubly-delimited, which we
+  #   need to transform for `jq` not to fail on the first line
+  #   that's doubly-escaped (\\"):
+  #     | sed -e 's/\\"/"/g' -e 's/\\\\"/\\"/g' \
+
   echo "${windows_list}" | head -c -4 | tail -c +3 \
   | jq '.[] | select(
       .wm_class == "gnome-terminal-server"
@@ -328,7 +338,7 @@ _hf_print_terminal_window_title_prefixes_Wayland () {
       --method org.gnome.Shell.Extensions.Windows.Details \
         {} \
   | gawk 'match($0, /\{.*\}/, a) {print a[0]}' \
-  | sed 's/\\"/"/g' \
+  | sed -e 's/\\"/"/g' -e 's/\\\\"/\\"/g' \
   | jq -r '.title' \
   | awk '{print $1}'
 }
