@@ -64,6 +64,16 @@ _hf_prompt_user_is_trapped_in_chroot () {
   ( _hf_prompt_os_is_macos && [ $(stat -f %i /) -ne 2 ] )
 }
 
+# DEVEL: If you need insight into the titlebar function, try logging
+# or even xtrace'ing to a tmp file, e.g.,
+#
+#   echo "BASH_XTRACEFD: ${BASH_XTRACEFD}" >> /tmp/xtrace
+#   exec 10> /tmp/xtrace
+#   export BASH_XTRACEFD=10
+#   set -x
+#   ...
+#   set +x
+
 _hf_prompt_format_titlebar () {
   # 2012.10.17: Also change the titlebar name for special terminal windows,
   #             like the log-tracing windows.
