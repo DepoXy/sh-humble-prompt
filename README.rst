@@ -106,3 +106,19 @@ https://github.com/ickyicky/window-calls
   - Or, if you're a macOS user, ``window-calls`` enables a lot of functionality
     you might instead access using `Hammerspoon <https://www.hammerspoon.org/>`__.
 
+################
+Related Projects
+################
+
+- Starship — "Cross-shell prompt"
+
+  *The minimal, blazing-fast, and infinitely customizable prompt for any shell!*
+
+  https://starship.rs/
+
+  https://github.com/starship/starship
+
+.. FTREQ/2025-01-22 16:25: Rewrite sh-humble-prompt using Starship
+
+  https://starship.rs/config/
+
