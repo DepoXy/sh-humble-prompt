@@ -65,12 +65,12 @@ Window title features:
 
       .. code-block::
 
-          '/home/user/.depoxy/ambers/bin/marco-toggle-window \\'1.\\' \\'1․\\''
+          '/home/user/.depoxy/ambers/bin/windows/toggle-visibility \\'1.\\' \\'1․\\''
 
       which calls a script to front the specific terminal window if not
       fronted, or to minimize it if it's already got focus:
 
-      https://github.com/DepoXy/depoxy/blob/1.8.3/bin/marco-toggle-window
+      https://github.com/DepoXy/depoxy/blob/1.14.3/bin/windows/toggle-visibility
 
 - Prints the leading ``~/`` in the window title when you're in
   a top-level user home directory (e.g., ``~/.local``).
