@@ -119,7 +119,7 @@ _hf_prompt_format_titlebar() {
   # 2021-07-16: Add window number to window title.
   # - CXREF: See _hf_print_terminal_window_number for deets.
   # Sets ITERM2_WINDOW_NUMBER
-  _hf_set_iterm2_window_number_environ
+  _humb_set_iterm2_window_number_environ
 
   local winnum="${ITERM2_WINDOW_NUMBER}"
 

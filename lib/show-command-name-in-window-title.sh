@@ -18,7 +18,7 @@
 
 _humb_hook_titlebar_update() {
   # Sets ITERM2_WINDOW_NUMBER
-  _hf_set_iterm2_window_number_environ
+  _humb_set_iterm2_window_number_environ
 
   # MEH: (lb): I'd rather the title not flicker for fast commands,
   # but it's nice to have for long-running commands, like `man foo`
@@ -41,7 +41,7 @@ _humb_hook_titlebar_update() {
 
 ITERM2_WINDOW_NUMBER=""
 
-_hf_set_iterm2_window_number_environ() {
+_humb_set_iterm2_window_number_environ() {
   local window_number
   window_number="$(_hf_print_terminal_window_number)"
 
@@ -371,7 +371,7 @@ _hf_titler_os_is_macos() {
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 _hf_cleanup_lib_term_window_title_show_command_name() {
-  unset -f _hf_set_iterm2_window_number_environ
+  unset -f _humb_set_iterm2_window_number_environ
   # Leave set: ITERM2_WINDOW_NUMBER
 
   unset -f _hf_titler_os_is_macos
