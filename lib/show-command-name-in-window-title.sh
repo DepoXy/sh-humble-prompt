@@ -34,7 +34,7 @@ _humb_hook_titlebar_update() {
 
   # This is a one-off script: Source it, then call _humb_hook_titlebar_update,
   # and it'll unset the functions it no longer needs.
-  _hf_cleanup_lib_term_window_title_show_command_name
+  _humb_cleanup_lib_term_window_title_show_command_name
 }
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
@@ -370,7 +370,7 @@ _humb_titler_os_is_macos() {
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-_hf_cleanup_lib_term_window_title_show_command_name() {
+_humb_cleanup_lib_term_window_title_show_command_name() {
   unset -f _humb_set_iterm2_window_number_environ
   # Leave set: ITERM2_WINDOW_NUMBER
 
@@ -383,7 +383,7 @@ _hf_cleanup_lib_term_window_title_show_command_name() {
 
   unset -f _humb_hook_titlebar_update
 
-  unset -f _hf_cleanup_lib_term_window_title_show_command_name
+  unset -f _humb_cleanup_lib_term_window_title_show_command_name
 }
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
