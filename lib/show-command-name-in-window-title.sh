@@ -253,7 +253,7 @@ _humb_print_terminal_window_number_linux_terminal() {
 # ***
 
 _humb_print_terminal_window_title_prefixes() {
-  if [ "$(_hf_probe_desktop_environment)" = "GNOME" ]; then
+  if [ "$(_humb_probe_desktop_environment)" = "GNOME" ]; then
     _humb_print_terminal_window_title_prefixes_Wayland
   else
     _humb_print_terminal_window_title_prefixes_XWindow
@@ -266,7 +266,7 @@ _humb_print_terminal_window_title_prefixes() {
 # But `wmctrl -l` shows a very limited subset of windows,
 # e.g., author only sees Chrome and GVim windows listed.
 
-_hf_probe_desktop_environment() {
+_humb_probe_desktop_environment() {
   # Colon-separated list, uppercased.
   local currdes
   currdes="$(echo "${XDG_CURRENT_DESKTOP}" | tr '[:lower:]' '[:upper:]')"
