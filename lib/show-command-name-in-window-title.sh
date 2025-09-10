@@ -221,10 +221,10 @@ _humb_print_terminal_window_number_linux_terminal() {
   dot_leader_group="\\(\\${DUBS_NORMAL_INDICATOR:-.}\\|${DUBS_STICKY_INDICATOR:-․}\\)"
 
   # Call prefixes separately (author tried this in a pipeline, e.g.,
-  #   assigned="$(_hf_print_terminal_window_title_prefixes | ...)"
+  #   assigned="$(_humb_print_terminal_window_title_prefixes | ...)"
   # but checking `${PIPESTATUS[0]} -ne 0` was always false).
   local prefixes
-  if ! prefixes="$(_hf_print_terminal_window_title_prefixes)"; then
+  if ! prefixes="$(_humb_print_terminal_window_title_prefixes)"; then
 
     return 1
   fi
@@ -252,11 +252,11 @@ _humb_print_terminal_window_number_linux_terminal() {
 
 # ***
 
-_hf_print_terminal_window_title_prefixes() {
+_humb_print_terminal_window_title_prefixes() {
   if [ "$(_hf_probe_desktop_environment)" = "GNOME" ]; then
-    _hf_print_terminal_window_title_prefixes_Wayland
+    _humb_print_terminal_window_title_prefixes_Wayland
   else
-    _hf_print_terminal_window_title_prefixes_XWindow
+    _humb_print_terminal_window_title_prefixes_XWindow
   fi
 }
 
@@ -294,7 +294,7 @@ _hf_probe_desktop_environment() {
 # REFER:
 # ~/.local/share/gnome-shell/extensions/
 
-_hf_print_terminal_window_title_prefixes_Wayland() {
+_humb_print_terminal_window_title_prefixes_Wayland() {
   local windows_list
   if ! windows_list="$(
     gdbus call --session --dest org.gnome.Shell \
@@ -351,7 +351,7 @@ _hf_print_terminal_window_title_prefixes_Wayland() {
 # CALSO:
 #   xwininfo -root -children
 
-_hf_print_terminal_window_title_prefixes_XWindow() {
+_humb_print_terminal_window_title_prefixes_XWindow() {
   if [ -z "${DISPLAY}" ] || ! command -v wmctrl >/dev/null; then
 
     return 1
