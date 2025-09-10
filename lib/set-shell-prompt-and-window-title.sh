@@ -117,7 +117,7 @@ _hf_prompt_format_titlebar() {
   #  titlebar='\[\e]0;\u@\h:\w\a\]'
 
   # 2021-07-16: Add window number to window title.
-  # - CXREF: See _hf_print_terminal_window_number for deets.
+  # - CXREF: See _humb_print_terminal_window_number for deets.
   # Sets ITERM2_WINDOW_NUMBER
   _humb_set_iterm2_window_number_environ
 

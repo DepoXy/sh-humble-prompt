@@ -43,7 +43,7 @@ ITERM2_WINDOW_NUMBER=""
 
 _humb_set_iterm2_window_number_environ() {
   local window_number
-  window_number="$(_hf_print_terminal_window_number)"
+  window_number="$(_humb_print_terminal_window_number)"
 
   if [ -n "${window_number}" ]; then
     if ${DUBS_ALWAYS_ON_VISIBLE:-false} && ! _hf_titler_os_is_macos; then
@@ -102,15 +102,15 @@ _humb_set_iterm2_window_number_environ() {
 #   but you probably don't want to mess with Ansible unless you're
 #   familiar with it. Best just to make custom bindings yourself.
 
-_hf_print_terminal_window_number() {
+_humb_print_terminal_window_number() {
   ! ${HOMFRIES_NO_WINDOW_NUMBER:-false} || return 0
 
   local window_number=""
 
   false ||
-    window_number="$(_hf_print_terminal_window_number_iterm)" ||
-    window_number="$(_hf_print_terminal_window_number_alacritty_macos)" ||
-    window_number="$(_hf_print_terminal_window_number_linux_terminal)" ||
+    window_number="$(_humb_print_terminal_window_number_iterm)" ||
+    window_number="$(_humb_print_terminal_window_number_alacritty_macos)" ||
+    window_number="$(_humb_print_terminal_window_number_linux_terminal)" ||
     true
 
   printf "%s" "${window_number}"
@@ -136,7 +136,7 @@ _hf_print_terminal_window_number() {
 # recreates ITERM_SESSION_ID so that `ssh <host>` to another Homefries
 # shell keeps using the same window number, even on a remote host.)
 
-_hf_print_terminal_window_number_iterm() {
+_humb_print_terminal_window_number_iterm() {
   if [ -z "${ITERM_SESSION_ID}" ]; then
 
     return 1
@@ -178,7 +178,7 @@ _hf_print_terminal_window_number_iterm() {
 #   windows. But parts of the border that overlap other apps or
 #   the Finder are still borderful (drawn).
 
-_hf_print_terminal_window_number_alacritty_macos() {
+_humb_print_terminal_window_number_alacritty_macos() {
   # FTREQ/2024-07-10: Try Alacritty on Linux and update this fcn.
   if ! _hf_titler_os_is_macos; then
 
@@ -214,7 +214,7 @@ _hf_print_terminal_window_number_alacritty_macos() {
 # It's unlikely another application is also prefixing numbers to
 # their window titles, though, we're just that special).
 
-_hf_print_terminal_window_number_linux_terminal() {
+_humb_print_terminal_window_number_linux_terminal() {
   local window_number=""
 
   local dot_leader_group
@@ -376,10 +376,10 @@ _hf_cleanup_lib_term_window_title_show_command_name() {
 
   unset -f _hf_titler_os_is_macos
 
-  unset -f _hf_print_terminal_window_number
-  unset -f _hf_print_terminal_window_number_iterm
-  unset -f _hf_print_terminal_window_number_alacritty_macos
-  unset -f _hf_print_terminal_window_number_linux_terminal
+  unset -f _humb_print_terminal_window_number
+  unset -f _humb_print_terminal_window_number_iterm
+  unset -f _humb_print_terminal_window_number_alacritty_macos
+  unset -f _humb_print_terminal_window_number_linux_terminal
 
   unset -f _humb_hook_titlebar_update
 
