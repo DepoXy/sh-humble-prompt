@@ -465,7 +465,7 @@ _hf_prompt_os_is_macos() {
 #       call it more than once. So it cleans itself up rather than
 #       hang around the environment.
 
-_hf_prompt_configure() {
+_humb_prompt_configure() {
   _hf_prompt_customize_shell_prompts_and_window_title
 
   unset -f _hf_prompt_os_is_linux
@@ -480,7 +480,7 @@ _hf_prompt_configure() {
 
   unset -f _hf_prompt_customize_shell_prompts_and_window_title
 
-  unset -f _hf_prompt_configure
+  unset -f _humb_prompt_configure
 }
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
