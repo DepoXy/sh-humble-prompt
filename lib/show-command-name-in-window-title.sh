@@ -16,7 +16,7 @@
 #   like we normally do, so the systemwide foregrounder shortcuts
 #   still work.
 
-_hf_hook_titlebar_update() {
+_humb_hook_titlebar_update() {
   # Sets ITERM2_WINDOW_NUMBER
   _hf_set_iterm2_window_number_environ
 
@@ -32,7 +32,7 @@ _hf_hook_titlebar_update() {
   # of the actively running command if there is one, e.g., `man bash`.
   trap 'printf "\033]0;%s\007" "${ITERM2_WINDOW_NUMBER}${BASH_COMMAND}"' DEBUG
 
-  # This is a one-off script: Source it, then call _hf_hook_titlebar_update,
+  # This is a one-off script: Source it, then call _humb_hook_titlebar_update,
   # and it'll unset the functions it no longer needs.
   _hf_cleanup_lib_term_window_title_show_command_name
 }
@@ -381,7 +381,7 @@ _hf_cleanup_lib_term_window_title_show_command_name() {
   unset -f _hf_print_terminal_window_number_alacritty_macos
   unset -f _hf_print_terminal_window_number_linux_terminal
 
-  unset -f _hf_hook_titlebar_update
+  unset -f _humb_hook_titlebar_update
 
   unset -f _hf_cleanup_lib_term_window_title_show_command_name
 }
