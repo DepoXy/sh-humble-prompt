@@ -254,7 +254,9 @@ _humb_print_terminal_window_number_linux_terminal() {
 
 _humb_print_terminal_window_title_prefixes() {
   if [ "$(_humb_probe_desktop_environment)" = "GNOME" ]; then
-    _humb_print_terminal_window_title_prefixes_Wayland
+    # Run in subshell to avoid polluting env.
+    # w/ third-party deps/ funcs.
+    (_humb_print_terminal_window_title_prefixes_Wayland)
   else
     _humb_print_terminal_window_title_prefixes_XWindow
   fi
@@ -295,58 +297,73 @@ _humb_probe_desktop_environment() {
 
 # ***
 
-# USAGE: Requires GNOME Shell Extension:
+# REFER: Uses integrated dependency to query Wayland window titles.
+#   https://github.com/DepoXy/gnome-window-calls#🪟
+# ~/.kit/sh/gnome-window-calls/lib/gnome-window-calls.sh
+
+# DPNDS: Requires `window-calls` GNOME Shell extension:
 #   https://extensions.gnome.org/extension/4724/window-calls/
 #   https://github.com/ickyicky/window-calls
-# REFER:
-# ~/.local/share/gnome-shell/extensions/
+# REFER: Installs to:
+#   ~/.local/share/gnome-shell/extensions/window-calls@domandoman.xyz/
+
+# SAVVY:
+# - Use jq filter to pick gnome-terminal window IDs only.
+# - For each ID, send gdbus command to window-calls
+#   extension to get window details, including title.
+# - Use gawk to remove the '(' ... ',)' around details.
+# - Remove embedded, escaped double quotes;
+#   and resolve JSON string escapes.
+#   - See raise-lower for comments — the Windows.Details
+#     response varies based on `'` and/or `"` characters
+#     in a window's title.
+#   - Basically, if any double-quote is double-or-more
+#     escaped, remove it (because it's part of a JSON
+#     string); and then convert all \" to " (because
+#     the outer window-call response was double-quoted,
+#     and the embedded JSON string used escape-quoting
+#     for JSON fields and values).
+# - Use jq to print each window title.
+# - Use awk to print only the first column, e.g.,
+#   '1.', '2.', etc.
 
 _humb_print_terminal_window_title_prefixes_Wayland() {
-  local windows_list
-  if ! windows_list="$(
-    gdbus call --session --dest org.gnome.Shell \
-      --object-path /org/gnome/Shell/Extensions/Windows \
-      --method org.gnome.Shell.Extensions.Windows.List
-  )"; then
-    # E.g. — Error: GDBus.Error:org.freedesktop.DBus.Error.UnknownMethod:
-    #   Object does not exist at path “/org/gnome/Shell/Extensions/Foo”
+  # Load: get_window_ids_Wayland_filtered
+  # - REFER: This dependency is included with the project,
+  #   under the deps/ directory.
+  #   - CXREF: In a DepoXy env., you'll find the original at:
+  #     ~/.kit/sh/gnome-window-calls/lib/gnome-window-calls.sh
+  local canon_base
+  canon_base="$(dirname -- "$(realpath -- "${BASH_SOURCE[0]}")")"
+  . "${canon_base}/../deps/gnome-window-calls/lib/gnome-window-calls.sh"
+
+  local jq_filter='select(
+    .wm_class == "gnome-terminal-server" or
+    .wm_class == "Alacritty"
+  )'
+
+  local window_ids
+  if ! window_ids="$(
+    get_window_ids_Wayland_filtered "${jq_filter}"
+  )" 2>/dev/null; then
+    # Emits error (that we inhibited) if window-calls not installed.
+    # - We don't print error. User should notice if the number prefix
+    #   is missing, and then they can investigate themselves, e.g.,
+    #   run `get_window_ids_Wayland_filtered` manually.
 
     return 1
   fi
 
-  # SAVVY:
-  # - Use jq to pick gnome-terminal windows only,
-  #   and emit a list of IDs.
-  # - For each ID, send gdbus command to window-calls
-  #   Extension to get window details, including title.
-  # - Use gawk to remove the '(' ... ',)' around details.
-  # - Remove double quote delimiter, for jq.
-  # - Use jq to print each window title.
-  # - Use awk to print only the first column, e.g.,
-  #   '1.', '2.', etc.
-
-  # REFER: See comments in DepoXy re: How to deal with escapes:
-  #   https://github.com/DepoXy/depoxy#🍯
-  #     ~/.depoxy/ambers/bin/windows/toggle-visibility
-  # - Removing escape characters before quotes usually works:
-  #     | sed 's/\\"/"/g' \
-  #   But sometimes the response is doubly-delimited, which we
-  #   need to transform for `jq` not to fail on the first line
-  #   that's doubly-escaped (\\"):
-  #     | sed -e 's/\\"/"/g' -e 's/\\\\"/\\"/g' \
-
-  echo "${windows_list}" | head -c -4 | tail -c +3 |
-    jq '.[] | select(
-      .wm_class == "gnome-terminal-server"
-      or .wm_class == "Alacritty"
-    ) | .id' |
+  # USYNC: See similar pipeline in upstream lib:
+  # ~/.kit/sh/gnome-window-calls/lib/gnome-window-calls.sh
+  echo "${window_ids}" |
     xargs -I{} \
       gdbus call --session --dest org.gnome.Shell \
       --object-path /org/gnome/Shell/Extensions/Windows \
       --method org.gnome.Shell.Extensions.Windows.Details \
       {} |
     gawk 'match($0, /\{.*\}/, a) {print a[0]}' |
-    sed -e 's/\\"/"/g' -e 's/\\\\"/\\"/g' |
+    sed -e 's/\\\(\\\)\+"//g' | sed -e 's/\\"/"/g' |
     jq -r '.title' |
     awk '{print $1}'
 }
