@@ -260,11 +260,16 @@ _humb_print_terminal_window_title_prefixes() {
   fi
 }
 
+# ***
+
 # SAVVY: You can use wmctrl in Wayland to some extent, e.g.:
 #   $ sudo apt install wmctrl && wmctrl -m
 #   Name: GNOME Shell
-# But `wmctrl -l` shows a very limited subset of windows,
-# e.g., author only sees Chrome and GVim windows listed.
+# But `wmctrl -l` won't show all windows, e.g., author only
+# sees Chrome and GVim windows listed.
+# - So for GNOME, we'll use a special (and optional) GNOME
+#   Shell extension that exposes a D-Bus interface to work
+#   with windows on Wayland.
 
 _humb_probe_desktop_environment() {
   # Colon-separated list, uppercased.
@@ -287,6 +292,8 @@ _humb_probe_desktop_environment() {
     done
   )
 }
+
+# ***
 
 # USAGE: Requires GNOME Shell Extension:
 #   https://extensions.gnome.org/extension/4724/window-calls/
@@ -343,6 +350,8 @@ _humb_print_terminal_window_title_prefixes_Wayland() {
     jq -r '.title' |
     awk '{print $1}'
 }
+
+# ***
 
 # CALSO:
 #   xdotool search --onlyvisible -class mate-terminal getwindowname %@
