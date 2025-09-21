@@ -376,6 +376,12 @@ _humb_cleanup_lib_term_window_title_show_command_name() {
 
   unset -f _humb_titler_os_is_macos
 
+  unset -f _humb_probe_desktop_environment
+
+  unset -f _humb_print_terminal_window_title_prefixes
+  unset -f _humb_print_terminal_window_title_prefixes_Wayland
+  unset -f _humb_print_terminal_window_title_prefixes_XWindow
+
   unset -f _humb_print_terminal_window_number
   unset -f _humb_print_terminal_window_number_iterm
   unset -f _humb_print_terminal_window_number_alacritty_macos
