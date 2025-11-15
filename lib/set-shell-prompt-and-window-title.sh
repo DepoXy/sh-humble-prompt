@@ -178,8 +178,8 @@ _humb_prompt_format_titlebar() {
 }
 
 _humb_prompt_customize_shell_prompts_and_window_title() {
-  # (lb): Note that colors.sh defines similar colors, but without
-  # the ``01;`` part. I cannot remember what that component means....
+  # - SAVVY: Note that colors.sh defines similar colors, but without
+  #   the `01;` (though author fails to recall what that does).
   local fg_red='\[\033[01;31m\]'
   local fg_green='\[\033[01;32m\]'
   local fg_yellow='\[\033[01;33m\]'
