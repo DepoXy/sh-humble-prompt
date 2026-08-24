@@ -54,10 +54,10 @@ _humb_prompt_is_user_logged_on_via_ssh() {
 }
 
 # 2015.03.04: I need to know when I'm in chroot hell.
-# NOTE: There's a better way using sudo to check if in chroot jail
-#       (which is compatible with Mac, BSD, etc.) but we don't want
-#       to use sudo, and we know we're on Linux. And on Linux,
-#       the inode of the (outermost) root directory is always 2.
+# REFER: There's a better way using sudo to check if in chroot jail
+#        (which is compatible with Mac, BSD, etc.) but we don't want
+#        to use sudo, and we know we're on Linux. And on Linux,
+#        the inode of the (outermost) root directory is always 2.
 
 _humb_prompt_user_is_trapped_in_chroot() {
   (_humb_prompt_os_is_linux && [ $(stat -c %i /) -ne 2 ]) ||
@@ -137,10 +137,10 @@ _humb_prompt_format_titlebar() {
   local endof_osc='\a'
 
   # Name this terminal window specially if special.
-  # NOTE: This information comes from Gnome, where we've set the Gnome shortcut
-  #       to pass this environment variable to us.
-  # NOTE: To test gnome-terminal, run it from your home directory, otherwise it
-  #       won't find your bash scripts.
+  # REFER: This information comes from Gnome, where we've set the Gnome shortcut
+  #        to pass this environment variable to us.
+  # SAVVY: To test gnome-terminal, run it from your home directory, otherwise it
+  #        won't find your bash scripts.
   local titlebar
 
   if ! _humb_prompt_is_user_logged_on_via_ssh; then
@@ -285,40 +285,40 @@ _humb_prompt_customize_shell_prompts_and_window_title() {
   #  https://en.wikipedia.org/wiki/Chroot
 
   # MAYBE/2018-12-23: Move these definitions to color_util.sh or similar?
-  # - NOTE: Bash 4.2 added Unicode support, i.e.,
-  #           echo -e "\uHHHH"
-  #           printf "\uHHHH"
-  # - NOTE: For 5 to 8 digiti Unicode character, use \U, e.g.,
-  #           echo -e "\UHHHHHHHH"
-  #           printf "\UHHHHHHHH"
-  # - NOTE: Pad the \U to 8 digits, or built-in printf may complain.
-  #           @mint19.3 $ printf "\U1F4A9"
-  #           💩
-  #           @mint19.3 $ /usr/bin/printf "\U1F4A9"
-  #           /usr/bin/printf: missing hexadecimal number in escape
-  #           @mint19.3 $ /usr/bin/printf "\U0001F4A9"
-  #           💩
-  #         (though latest Bash `echo` and `printf` do not care).
-  # - NOTE: If set in PS1 directly, need to $'interpolate', e.g.,
-  #           PS1="${titlebar}${prompt_stuff}"$' \U1F480 '"\$ "
-  #         - SAVVY: Bash's $'...' sees \uXXXX unicode espace
-  #           sequences, but not $"..."
-  # - NOTE: And now that I've noted all of this, It's actually
-  #         easier to just embed the Unicode within this file.
-  #         And then raw macOS (with system Bash 3.x, whose `echo`
-  #         and `printf` won't recognize the \Unicode syntax)
-  #         will work.
-  # - NOTE: I was using ⚓ for _hf_session_is_subshell on Linux for
-  #         years until I discovered on @macOS it renders at the
-  #         lowly VS15 variant, ⚓︎.
-  #         - I tried the ring buoy instead but the terminal does
-  #           not read its width correctly. This messes up Bash
-  #           history, e.g., if you <Up> then <Home>, the cursor
-  #           is off by one. Same for a few other glyphs.
-  #         - Canoe works, but I'd like a fuller, smoother icon.
-  #           And I like the red color pop that leads my eye to
-  #           the start of the prompt.
-  #         - Works: 🛶 🍁 🎃 🍿 🫑 🍒 🍓 🍉 🍎 / Don't: ⚓ 🛟 🥭
+  # - REFER: Bash 4.2 added Unicode support, i.e.,
+  #            echo -e "\uHHHH"
+  #            printf "\uHHHH"
+  # - REFER: For 5 to 8 digiti Unicode character, use \U, e.g.,
+  #            echo -e "\UHHHHHHHH"
+  #            printf "\UHHHHHHHH"
+  # - REFER: Pad the \U to 8 digits, or built-in printf may complain.
+  #            @mint19.3 $ printf "\U1F4A9"
+  #            💩
+  #            @mint19.3 $ /usr/bin/printf "\U1F4A9"
+  #            /usr/bin/printf: missing hexadecimal number in escape
+  #            @mint19.3 $ /usr/bin/printf "\U0001F4A9"
+  #            💩
+  #          (though latest Bash `echo` and `printf` do not care).
+  # - REFER: If set in PS1 directly, need to $'interpolate', e.g.,
+  #            PS1="${titlebar}${prompt_stuff}"$' \U1F480 '"\$ "
+  #          - SAVVY: Bash's $'...' sees \uXXXX unicode espace
+  #            sequences, but not $"..."
+  # - REFER: And now that I've noted all of this, It's actually
+  #          easier to just embed the Unicode within this file.
+  #          And then raw macOS (with system Bash 3.x, whose `echo`
+  #          and `printf` won't recognize the \Unicode syntax)
+  #          will work.
+  # - REFER:  I was using ⚓ for _hf_session_is_subshell on Linux for
+  #          years until I discovered on @macOS it renders at the
+  #          lowly VS15 variant, ⚓︎.
+  #          - I tried the ring buoy instead but the terminal does
+  #            not read its width correctly. This messes up Bash
+  #            history, e.g., if you <Up> then <Home>, the cursor
+  #            is off by one. Same for a few other glyphs.
+  #          - Canoe works, but I'd like a fuller, smoother icon.
+  #            And I like the red color pop that leads my eye to
+  #            the start of the prompt.
+  #          - Works: 🛶 🍁 🎃 🍿 🫑 🍒 🍓 🍉 🍎 / Don't: ⚓ 🛟 🥭
   local u_tomato="🍅" #             # 🍅  $(printf "\U1F345")
   # local u_evergreen_tree="🌲"     # 🌲  $(printf "\U1F332")
   # local u_cactus="🌵"             # 🌵  $(printf "\U1F335")
@@ -558,9 +558,9 @@ _humb_prompt_os_is_macos() {
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-# NOTE: This function is a one-off, as it wouldn't be necessary to
-#       call it more than once. So it cleans itself up rather than
-#       hang around the environment.
+# REFER: This function is a one-off, as it wouldn't be necessary to
+# call it more than once. So it cleans itself up rather than hang
+# around the environment.
 
 _humb_prompt_configure() {
   _humb_prompt_customize_shell_prompts_and_window_title
