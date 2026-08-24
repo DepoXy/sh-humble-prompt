@@ -71,11 +71,6 @@ _humb_prompt_format_titlebar() {
   # Gnome-terminal's default (though it doesn't specify it, it just is):
   #  titlebar='\[\e]0;\u@\h:\w\a\]'
 
-  # 2021-07-16: Add window number to window title.
-  # - CXREF: See _humb_print_terminal_window_number for deets.
-  # Sets ITERM2_WINDOW_NUMBER
-  _humb_set_iterm2_window_number_environ
-
   local winnum="${ITERM2_WINDOW_NUMBER}"
 
   # - CXREF: ~/.kit/sh/sh-humble-prompt/lib/show-command-name-in-window-title.sh
@@ -240,6 +235,11 @@ _humb_prompt_customize_shell_prompts_and_window_title() {
   local local_shell_icon
   local remote_shell_icon
   _humb_prompt_shell_prompt_set_shell_icons
+
+  # 2021-07-16: Add window number to window title.
+  # - CXREF: See _humb_print_terminal_window_number for deets.
+  # Sets ITERM2_WINDOW_NUMBER.
+  _humb_set_iterm2_window_number_environ
 
   _humb_prompt_customize_shell_prompt_PS1
   _humb_prompt_customize_shell_prompt_PS2
