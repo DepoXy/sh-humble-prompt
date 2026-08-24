@@ -308,7 +308,8 @@ _humb_probe_desktop_environment() {
 #   ~/.local/share/gnome-shell/extensions/window-calls@domandoman.xyz/
 
 # SAVVY:
-# - Use jq filter to pick gnome-terminal window IDs only.
+# - Use jq filter to pick gnome-terminal and Alacritty
+#   window IDs only.
 # - For each ID, send gdbus command to window-calls
 #   extension to get window details, including title.
 # - Use gawk to remove the '(' ... ',)' around details.
