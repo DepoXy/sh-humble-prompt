@@ -354,7 +354,7 @@ _humb_prompt_customize_shell_prompt_PS1() {
   fi
 }
 
-# ***
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 _humb_prompt_customize_shell_prompt_PS2() {
   # 2018-05-28: How about a bold PS2 (continuation) prompt?
