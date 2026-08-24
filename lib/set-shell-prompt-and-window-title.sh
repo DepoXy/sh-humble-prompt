@@ -239,71 +239,9 @@ _humb_prompt_customize_shell_prompts_and_window_title() {
   #  http://unix.stackexchange.com/questions/3171/what-is-debian-chroot-in-bashrc
   #  https://en.wikipedia.org/wiki/Chroot
 
-  # MAYBE/2018-12-23: Move these definitions to color_util.sh or similar?
-  # - REFER: Bash 4.2 added Unicode support, i.e.,
-  #            echo -e "\uHHHH"
-  #            printf "\uHHHH"
-  # - REFER: For 5 to 8 digiti Unicode character, use \U, e.g.,
-  #            echo -e "\UHHHHHHHH"
-  #            printf "\UHHHHHHHH"
-  # - REFER: Pad the \U to 8 digits, or built-in printf may complain.
-  #            @mint19.3 $ printf "\U1F4A9"
-  #            💩
-  #            @mint19.3 $ /usr/bin/printf "\U1F4A9"
-  #            /usr/bin/printf: missing hexadecimal number in escape
-  #            @mint19.3 $ /usr/bin/printf "\U0001F4A9"
-  #            💩
-  #          (though latest Bash `echo` and `printf` do not care).
-  # - REFER: If set in PS1 directly, need to $'interpolate', e.g.,
-  #            PS1="${titlebar}${prompt_stuff}"$' \U1F480 '"\$ "
-  #          - SAVVY: Bash's $'...' sees \uXXXX unicode espace
-  #            sequences, but not $"..."
-  # - REFER: And now that I've noted all of this, It's actually
-  #          easier to just embed the Unicode within this file.
-  #          And then raw macOS (with system Bash 3.x, whose `echo`
-  #          and `printf` won't recognize the \Unicode syntax)
-  #          will work.
-  # - REFER:  I was using ⚓ for _hf_session_is_subshell on Linux for
-  #          years until I discovered on @macOS it renders at the
-  #          lowly VS15 variant, ⚓︎.
-  #          - I tried the ring buoy instead but the terminal does
-  #            not read its width correctly. This messes up Bash
-  #            history, e.g., if you <Up> then <Home>, the cursor
-  #            is off by one. Same for a few other glyphs.
-  #          - Canoe works, but I'd like a fuller, smoother icon.
-  #            And I like the red color pop that leads my eye to
-  #            the start of the prompt.
-  #          - Works: 🛶 🍁 🎃 🍿 🫑 🍒 🍓 🍉 🍎 / Don't: ⚓ 🛟 🥭
-  local u_tomato="🍅" #             # 🍅  $(printf "\U1F345")
-  # local u_evergreen_tree="🌲"     # 🌲  $(printf "\U1F332")
-  # local u_cactus="🌵"             # 🌵  $(printf "\U1F335")
-  local u_mushroom="🍄" #           # 🍄  $(printf "\U1F344")
-  local u_skull="💀"    #           # 💀  $(printf "\U1F480")
-  local u_horny="😈"    #           # 💀  $(printf "\U1F480")
-  # local u_owl="🦉"                # 🦉  $(printf "\U1F989")
-  # local u_herb="🌿"               # 🌿  $(printf "\U1F33F")
-  # local u_pineapple="🍍"          # 🍍  $(printf "\U1F34D")
-  # # (Draws too light to see:)
-  # local u_skull_n_xbones="☠"      # ☠  $(printf "\u2620")
-
-  local local_shell_icon="${u_mushroom}"
-  local remote_shell_icon="${u_skull}"
-
-  if _hf_session_is_subshell; then
-    local_shell_icon="${u_tomato}"
-    remote_shell_icon="${u_horny}"
-  fi
-
-  if [ ${HOMEFRIES_PS1_GIT_REBASE_STYLE:-0} -eq 1 ]; then
-    # 2024-08-19: Styles I demoed: (🍅) >🍅< ⟪🍅⟫ ⟬🍅⟭ ┃🍅┃
-    # - I also demoed other icons but none of these render
-    #   well in the macOS terminal good: ⏪ ☢️  ⚠️  🏁
-    local_shell_icon='$([ -f "$(git root 2> /dev/null)/.git/rebase-merge/git-rebase-todo" ] && echo "('"${local_shell_icon}"')" || echo "'"${local_shell_icon}"'")'
-    remote_shell_icon='$([ -f "$(git root 2> /dev/null)/.git/rebase-merge/git-rebase-todo" ] && echo "('"${remote_shell_icon}"')" || echo "'"${remote_shell_icon}"'")'
-  fi
-
-  local_shell_icon="${local_shell_icon} "
-  remote_shell_icon="${remote_shell_icon} "
+  local local_shell_icon
+  local remote_shell_icon
+  _humb_prompt_shell_prompt_set_shell_icons
 
   _humb_prompt_customize_shell_prompt_PS1
   _humb_prompt_customize_shell_prompt_PS2
@@ -444,6 +382,76 @@ home_fries_set_PS4() {
   # Default is: PS4='+'
   PS4='(${BASH_SOURCE[0]}:${LINENO}): ${FUNCNAME[0]} - [${SHLVL},${BASH_SUBSHELL}, $?]
   '
+}
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
+# MAYBE/2018-12-23: Move these definitions to color_util.sh or similar?
+# - REFER: Bash 4.2 added Unicode support, i.e.,
+#            echo -e "\uHHHH"
+#            printf "\uHHHH"
+# - REFER: For 5 to 8 digiti Unicode character, use \U, e.g.,
+#            echo -e "\UHHHHHHHH"
+#            printf "\UHHHHHHHH"
+# - REFER: Pad the \U to 8 digits, or built-in printf may complain.
+#            @mint19.3 $ printf "\U1F4A9"
+#            💩
+#            @mint19.3 $ /usr/bin/printf "\U1F4A9"
+#            /usr/bin/printf: missing hexadecimal number in escape
+#            @mint19.3 $ /usr/bin/printf "\U0001F4A9"
+#            💩
+#          (though latest Bash `echo` and `printf` do not care).
+# - REFER: If set in PS1 directly, need to $'interpolate', e.g.,
+#            PS1="${titlebar}${prompt_stuff}"$' \U1F480 '"\$ "
+#          - SAVVY: Bash's $'...' sees \uXXXX unicode espace
+#            sequences, but not $"..."
+# - REFER: And now that I've noted all of this, It's actually
+#          easier to just embed the Unicode within this file.
+#          And then raw macOS (with system Bash 3.x, whose `echo`
+#          and `printf` won't recognize the \Unicode syntax)
+#          will work.
+# - REFER:  I was using ⚓ for _hf_session_is_subshell on Linux for
+#          years until I discovered on @macOS it renders at the
+#          lowly VS15 variant, ⚓︎.
+#          - I tried the ring buoy instead but the terminal does
+#            not read its width correctly. This messes up Bash
+#            history, e.g., if you <Up> then <Home>, the cursor
+#            is off by one. Same for a few other glyphs.
+#          - Canoe works, but I'd like a fuller, smoother icon.
+#            And I like the red color pop that leads my eye to
+#            the start of the prompt.
+#          - Works: 🛶 🍁 🎃 🍿 🫑 🍒 🍓 🍉 🍎 / Don't: ⚓ 🛟 🥭
+_humb_prompt_shell_prompt_set_shell_icons() {
+  local u_tomato="🍅" #             # 🍅  $(printf "\U1F345")
+  # local u_evergreen_tree="🌲"     # 🌲  $(printf "\U1F332")
+  # local u_cactus="🌵"             # 🌵  $(printf "\U1F335")
+  local u_mushroom="🍄" #           # 🍄  $(printf "\U1F344")
+  local u_skull="💀"    #           # 💀  $(printf "\U1F480")
+  local u_horny="😈"    #           # 💀  $(printf "\U1F480")
+  # local u_owl="🦉"                # 🦉  $(printf "\U1F989")
+  # local u_herb="🌿"               # 🌿  $(printf "\U1F33F")
+  # local u_pineapple="🍍"          # 🍍  $(printf "\U1F34D")
+  # # (Draws too light to see:)
+  # local u_skull_n_xbones="☠"      # ☠  $(printf "\u2620")
+
+  local_shell_icon="${u_mushroom}"
+  remote_shell_icon="${u_skull}"
+
+  if _hf_session_is_subshell; then
+    local_shell_icon="${u_tomato}"
+    remote_shell_icon="${u_horny}"
+  fi
+
+  if [ ${HOMEFRIES_PS1_GIT_REBASE_STYLE:-0} -eq 1 ]; then
+    # 2024-08-19: Styles I demoed: (🍅) >🍅< ⟪🍅⟫ ⟬🍅⟭ ┃🍅┃
+    # - I also demoed other icons but none of these render
+    #   well in the macOS terminal good: ⏪ ☢️  ⚠️  🏁
+    local_shell_icon='$([ -f "$(git root 2> /dev/null)/.git/rebase-merge/git-rebase-todo" ] && echo "('"${local_shell_icon}"')" || echo "'"${local_shell_icon}"'")'
+    remote_shell_icon='$([ -f "$(git root 2> /dev/null)/.git/rebase-merge/git-rebase-todo" ] && echo "('"${remote_shell_icon}"')" || echo "'"${remote_shell_icon}"'")'
+  fi
+
+  local_shell_icon="${local_shell_icon} "
+  remote_shell_icon="${remote_shell_icon} "
 }
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
