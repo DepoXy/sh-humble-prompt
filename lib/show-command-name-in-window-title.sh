@@ -17,8 +17,10 @@
 #   still work.
 
 _humb_hook_titlebar_update() {
-  # Sets ITERM2_WINDOW_NUMBER
-  _humb_set_iterm2_window_number_environ
+  if [ -z "${ITERM2_WINDOW_NUMBER}" ]; then
+    # Sets ITERM2_WINDOW_NUMBER.
+    _humb_set_iterm2_window_number_environ
+  fi
 
   # MEH: (lb): I'd rather the title not flicker for fast commands,
   # but it's nice to have for long-running commands, like `man foo`
