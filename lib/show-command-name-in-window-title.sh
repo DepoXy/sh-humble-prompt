@@ -32,6 +32,11 @@ _humb_hook_titlebar_update() {
   # title is restored. This makes for a nice titlebar title that shows the
   # basename of the directory when the prompt is active, but shows the name
   # of the actively running command if there is one, e.g., `man bash`.
+
+  # SAVVY: This is what actually changes the window titlebar title —
+  # and what "claims" ITERM2_WINDOW_NUMBER.
+  # - ALTLY: If user disable this mechanism (see HUMB_SHOW_COMMAND_IN_TITLE),
+  #   then the PS1= will claim ITERM2_WINDOW_NUMBER.
   trap 'printf "\033]0;%s\007" "${ITERM2_WINDOW_NUMBER}${BASH_COMMAND}"' DEBUG
 
   # This is a one-off script: Source it, then call _humb_hook_titlebar_update,

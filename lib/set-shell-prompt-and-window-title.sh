@@ -19,6 +19,22 @@ HOMEFRIES_PS1_PREV_CMD_FAILED_STYLE=${HOMEFRIES_PS1_PREV_CMD_FAILED_STYLE:-1}
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
+_humb_prompt_source_deps() {
+  local canon_base
+  canon_base="$(dirname -- "$(realpath -- "${BASH_SOURCE[0]}")")"
+
+  if ! command -v "dirlock" >/dev/null; then
+    if ! command -v "print_nanos_now" >/dev/null; then
+      # CXREF: sh-print-nanos-now/bin/print-nanos-now.sh
+      . "${canon_base}/../deps/sh-print-nanos-now/bin/print-nanos-now.sh"
+    fi
+
+    . "${canon_base}/dirlock_util.sh"
+  fi
+}
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
 # DEVEL: If you need insight into the titlebar function, try logging
 # or even xtrace'ing to a tmp file, e.g.,
 #
@@ -236,12 +252,34 @@ _humb_prompt_customize_shell_prompts_and_window_title() {
   local remote_shell_icon
   _humb_prompt_shell_prompt_set_shell_icons
 
+  # ***
+
+  # Sync. access to reading all window titles, picking avail.
+  # window number, and then writing the number to the window
+  # title.
+  local lock_dir="${HUMBLE_WINNUM_LOCK_DIR:-${TMPDIR:-/tmp}/sh-humble-prompt--LOCK}"
+  dirlock_acquire
+
   # 2021-07-16: Add window number to window title.
   # - CXREF: See _humb_print_terminal_window_number for deets.
   # Sets ITERM2_WINDOW_NUMBER.
   _humb_set_iterm2_window_number_environ
 
+  # If user hasn't opted-out using DEBUG trap to manage window title,
+  # update it now with the window number ("claiming" it) so we can
+  # release the lock in a timely manner.
+  if ${HUMB_SHOW_COMMAND_IN_TITLE:-true}; then
+    _humb_hook_titlebar_update
+
+    dirlock_release
+  fi
+
   _humb_prompt_customize_shell_prompt_PS1
+
+  if ! ${HUMB_SHOW_COMMAND_IN_TITLE:-true}; then
+    dirlock_release
+  fi
+
   _humb_prompt_customize_shell_prompt_PS2
 }
 
@@ -457,6 +495,22 @@ _humb_prompt_shell_prompt_set_shell_icons() {
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
+dirlock_acquire() {
+  # >&2 echo "dirlock: ${lock_dir}"
+  dirlock "${lock_dir}" \
+    "${_DONT_FLOCKIN_CARE:-false}" \
+    "${_FLOCKING_REQUIRED:-false}" \
+    "${_FLOCKING_RE_TRIES:--1}" \
+    "${_FLOCKING_TIME_OUT:-0}"
+}
+
+dirlock_release() {
+  # >&2 echo "dunlock: ${lock_dir}"
+  dunlock "${lock_dir}"
+}
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
 _humb_prompt_is_user_logged_on_via_ssh() {
   # https://unix.stackexchange.com/questions/9605/how-can-i-detect-if-the-shell-is-controlled-from-ssh
   # "If one of the variables SSH_CLIENT or SSH_TTY is defined, it's an ssh session.
@@ -574,6 +628,8 @@ _humb_prompt_os_is_macos() {
 # around the environment.
 
 _humb_prompt_configure() {
+  _humb_prompt_source_deps
+
   _humb_prompt_customize_shell_prompts_and_window_title
 
   unset -f _humb_prompt_os_is_linux
