@@ -229,8 +229,6 @@ _humb_prompt_customize_shell_prompts_and_window_title() {
   #     ;;
   #   esac
 
-  local titlebar="$(_humb_prompt_format_titlebar)"
-
   # 2012.10.17: The default bash includes ${debian_chroot:+($debian_chroot)} in
   # the PS1 string, but it really shouldn't be set on any of our systems (it's
   # pretty much obsolete, or at least pertains to a linux usage we're not).
@@ -306,6 +304,14 @@ _humb_prompt_customize_shell_prompt_PS1() {
     return
   fi
 
+  local titlebar
+  titlebar="$(_humb_prompt_format_titlebar)"
+
+  if ${HOMEFRIES_PS1_EMOJI_DISABLE:-false}; then
+    local_shell_icon=""
+    remote_shell_icon=""
+  fi
+
   local prompt_symbol="\$"
   if [ ${HOMEFRIES_PS1_GIT_REBASE_STYLE:-0} -eq 2 ]; then
     prompt_symbol='$([ -f "$(git root 2> /dev/null)/.git/rebase-merge/git-rebase-todo" ] && echo "(\$)" || echo "\$")'
@@ -322,11 +328,6 @@ _humb_prompt_customize_shell_prompt_PS1() {
     # ALTLY: Use one test, but then the final PS1 string is longer (because
     # ${prompt_symbol} is duplicated):
     #   prompt_symbol="\$(test \${_humb_exitcode:-0} -ne 0 && echo \"${fg_red}${prompt_symbol}${attr_reset}\" || echo \"${prompt_symbol}\")"
-  fi
-
-  if ${HOMEFRIES_PS1_EMOJI_DISABLE:-false}; then
-    local_shell_icon=""
-    remote_shell_icon=""
   fi
 
   if [ $EUID -eq 0 ]; then
