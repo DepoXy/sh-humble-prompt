@@ -19,51 +19,6 @@ HOMEFRIES_PS1_PREV_CMD_FAILED_STYLE=${HOMEFRIES_PS1_PREV_CMD_FAILED_STYLE:-1}
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
-_humb_prompt_is_user_logged_on_via_ssh() {
-  # https://unix.stackexchange.com/questions/9605/how-can-i-detect-if-the-shell-is-controlled-from-ssh
-  # "If one of the variables SSH_CLIENT or SSH_TTY is defined, it's an ssh session.
-  #  If the login shell's parent process name is sshd, it's an ssh session."
-  if [ -n "${SSH_CLIENT}" ] || [ -n "${SSH_TTY}" ]; then
-
-    return 0
-  else
-    local command_name
-    # E.g., locally on LM MATE:
-    #   mate-terminal
-    # Or SSH to LM MATE:
-    #   sshd
-    # Or SSH to macoS:
-    #   sshd-session: user@ttys014
-    command_name="$(ps -o comm= -p ${PPID} | sed 's/:.*$//')"
-
-    case "${command_name}" in
-    sshd | sshd-session)
-      # DUNNO/2024-10-28: Not sure this branch ever followed, or
-      # if SSH_CLIENT/SSH_TTY checks always followed instead.
-
-      return 0
-      ;;
-    *)
-
-      return 1
-      ;;
-    esac
-  fi
-
-  return 1
-}
-
-# 2015.03.04: I need to know when I'm in chroot hell.
-# REFER: There's a better way using sudo to check if in chroot jail
-#        (which is compatible with Mac, BSD, etc.) but we don't want
-#        to use sudo, and we know we're on Linux. And on Linux,
-#        the inode of the (outermost) root directory is always 2.
-
-_humb_prompt_user_is_trapped_in_chroot() {
-  (_humb_prompt_os_is_linux && [ $(stat -c %i /) -ne 2 ]) ||
-    (_humb_prompt_os_is_macos && [ $(stat -f %i /) -ne 2 ])
-}
-
 # DEVEL: If you need insight into the titlebar function, try logging
 # or even xtrace'ing to a tmp file, e.g.,
 #
@@ -489,6 +444,53 @@ home_fries_set_PS4() {
   # Default is: PS4='+'
   PS4='(${BASH_SOURCE[0]}:${LINENO}): ${FUNCNAME[0]} - [${SHLVL},${BASH_SUBSHELL}, $?]
   '
+}
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
+_humb_prompt_is_user_logged_on_via_ssh() {
+  # https://unix.stackexchange.com/questions/9605/how-can-i-detect-if-the-shell-is-controlled-from-ssh
+  # "If one of the variables SSH_CLIENT or SSH_TTY is defined, it's an ssh session.
+  #  If the login shell's parent process name is sshd, it's an ssh session."
+  if [ -n "${SSH_CLIENT}" ] || [ -n "${SSH_TTY}" ]; then
+
+    return 0
+  else
+    local command_name
+    # E.g., locally on LM MATE:
+    #   mate-terminal
+    # Or SSH to LM MATE:
+    #   sshd
+    # Or SSH to macoS:
+    #   sshd-session: user@ttys014
+    command_name="$(ps -o comm= -p ${PPID} | sed 's/:.*$//')"
+
+    case "${command_name}" in
+    sshd | sshd-session)
+      # DUNNO/2024-10-28: Not sure this branch ever followed, or
+      # if SSH_CLIENT/SSH_TTY checks always followed instead.
+
+      return 0
+      ;;
+    *)
+
+      return 1
+      ;;
+    esac
+  fi
+
+  return 1
+}
+
+# 2015.03.04: I need to know when I'm in chroot hell.
+# REFER: There's a better way using sudo to check if in chroot jail
+#        (which is compatible with Mac, BSD, etc.) but we don't want
+#        to use sudo, and we know we're on Linux. And on Linux,
+#        the inode of the (outermost) root directory is always 2.
+
+_humb_prompt_user_is_trapped_in_chroot() {
+  (_humb_prompt_os_is_linux && [ $(stat -c %i /) -ne 2 ]) ||
+    (_humb_prompt_os_is_macos && [ $(stat -f %i /) -ne 2 ])
 }
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
