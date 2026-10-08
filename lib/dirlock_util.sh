@@ -105,24 +105,6 @@ dirlock() {
     #     return ${got_lock}
     #   fi
     else
-      # Like Ethernet, retry, but with a random backoff. This is because cron
-      # might be running all of our scripts simultaneously, and they might each
-      # be trying for the same locks to see what to do -- and it'd be a shame
-      # if every time cron ran, the same script won the lock contest and all of
-      # the other scripts immediately bailed, because then nothing would happen!
-      #
-      # NOTED: If your wait logic here could exceed the interval between crons,
-      #        you could end up with always the same number of scripts running.
-      #        E.g., consider one instance of a script running for an hour, but
-      #        every minute you create a process that waits up to three minutes
-      #        for the lock -- at minute 0 is the hour-long process, and minute
-      #        1 is a process that tries for the lock until minute 4; at minute
-      #        2 is a process that tries for the lock until minute 5; and so
-      #        on, such that, starting at minute 4, you'll always have the
-      #        hour-long process and three other scripts running (though not
-      #        doing much, other than sleeping and waiting for the lock every
-      #        once in a while).
-      #
       local debug_traced_once=false
       while [ ${FLOCKING_RE_TRIES} -ne 0 ]; do
         local debug_trace_time_0
@@ -161,6 +143,24 @@ dirlock() {
 }
 
 # ***
+
+# Like Ethernet, retry, but with a random backoff. This is because cron
+# might be running all of our scripts simultaneously, and they might each
+# be trying for the same locks to see what to do -- and it'd be a shame
+# if every time cron ran, the same script won the lock contest and all of
+# the other scripts immediately bailed, because then nothing would happen!
+#
+# NOTED: If your wait logic here could exceed the interval between crons,
+#        you could end up with always the same number of scripts running.
+#        E.g., consider one instance of a script running for an hour, but
+#        every minute you create a process that waits up to three minutes
+#        for the lock -- at minute 0 is the hour-long process, and minute
+#        1 is a process that tries for the lock until minute 4; at minute
+#        2 is a process that tries for the lock until minute 5; and so
+#        on, such that, starting at minute 4, you'll always have the
+#        hour-long process and three other scripts running (though not
+#        doing much, other than sleeping and waiting for the lock every
+#        once in a while).
 
 count_dirlock_failed_and_sleep_before_trying_again() {
   if [ ${FLOCKING_RE_TRIES} -gt 0 ]; then
