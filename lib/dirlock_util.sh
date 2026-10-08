@@ -70,7 +70,7 @@ dirlock() {
     # We'll either: a) try again; b) give up; or c) fail miserably.
     #
     # E.g., mkdir: cannot create directory `tmp': Permission denied
-    if [ $(printf "${resp}" | grep 'denied') ]; then
+    if printf "${resp}" | grep -q 'denied'; then
       print_stderr_gaffe_on_unexpected_denied_response
     #
     # We expect that the directory already exists... though maybe the other
