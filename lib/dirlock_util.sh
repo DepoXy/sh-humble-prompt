@@ -125,28 +125,10 @@ dirlock() {
       #
       local debug_traced_once=false
       while [ ${FLOCKING_RE_TRIES} -ne 0 ]; do
-        if [ ${FLOCKING_RE_TRIES} -gt 0 ]; then
-          FLOCKING_RE_TRIES=$((FLOCKING_RE_TRIES - 1))
-        fi
-
-        if ! ${debug_traced_once}; then
-          $DEBUG_TRACE && >&2 echo \
-            "Mutex in use: will retry at most ${FLOCKING_RE_TRIES} times " \
-            "or for at most ${FLOCKING_TIME_OUT} secs."
-          debug_traced_once=true
-        fi
-
         local debug_trace_time_0
-        debug_trace_time_0=$(print_nanos_now)
-
-        # Pick a random number btw. 0.01 and 0.06.
-        local RAND_10_to_60="0.0$((RANDOM % 51 + 10))"
-        sleep "${RAND_10_to_60}"
-
         local fcn_time_1
         local elapsed_time
-        fcn_time_1=$(print_nanos_now)
-        elapsed_time=$(echo "${fcn_time_1} - ${fcn_time_0}" | bc -l)
+        count_dirlock_failed_and_sleep_before_trying_again
 
         # Try again — See if it's our turn yet!
         if resp="$(mkdir -- "${FLOCKING_DIR_PATH}" 2>&1)"; then
@@ -192,6 +174,28 @@ dirlock() {
 }
 
 # ***
+
+count_dirlock_failed_and_sleep_before_trying_again() {
+  if [ ${FLOCKING_RE_TRIES} -gt 0 ]; then
+    FLOCKING_RE_TRIES=$((FLOCKING_RE_TRIES - 1))
+  fi
+
+  if ! ${debug_traced_once}; then
+    $DEBUG_TRACE && >&2 echo \
+      "Mutex in use: will retry at most ${FLOCKING_RE_TRIES} times " \
+      "or for at most ${FLOCKING_TIME_OUT} secs."
+    debug_traced_once=true
+  fi
+
+  debug_trace_time_0=$(print_nanos_now)
+
+  # Pick a random number btw. 0.01 and 0.06.
+  local RAND_10_to_60="0.0$((RANDOM % 51 + 10))"
+  sleep "${RAND_10_to_60}"
+
+  fcn_time_1=$(print_nanos_now)
+  elapsed_time=$(echo "${fcn_time_1} - ${fcn_time_0}" | bc -l)
+}
 
 debug_trace_opt_in_waiting_message_periodically() {
   local prev_debug_trace
