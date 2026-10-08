@@ -61,22 +61,7 @@ dirlock() {
 
     got_lock=0
   elif ${DONT_FLOCKIN_CARE}; then
-    # We were unable to make the directory, but the dev. wants us to go on.
-    if [ $(printf "${resp}" | grep 'exists') ]; then
-      # E.g., mkdir: cannot create directory `tmp': File exists
-      $DEBUG_TRACE && >&2 echo "Mutex exists and owned but: DONT_FLOCKIN_CARE."
-
-      got_lock=0
-    elif [ $(printf "${resp}" | grep 'denied') ]; then
-      # E.g., mkdir: cannot create directory `tmp': Permission denied
-      $DEBUG_TRACE && >&2 echo "Mutex cannot be created but: DONT_FLOCKIN_CARE."
-
-      got_lock=0
-    else
-      $DEBUG_TRACE && >&2 echo "ERROR: Unexpected response from mkdir: $resp."
-
-      got_lock=2
-    fi
+    debug_trace_immediate_defeat ${got_lock}
 
     return ${got_lock}
   else
@@ -140,6 +125,29 @@ dirlock() {
   finish_dirlocking ${got_lock}
 
   return ${got_lock}
+}
+
+# ***
+
+debug_trace_immediate_defeat() {
+  local got_lock="$1"
+
+  # We were unable to make the directory, but the dev. wants us to go on.
+  if [ $(printf "${resp}" | grep 'exists') ]; then
+    # E.g., mkdir: cannot create directory `tmp': File exists
+    $DEBUG_TRACE && >&2 echo "Mutex exists and owned but: DONT_FLOCKIN_CARE."
+
+    got_lock=0
+  elif [ $(printf "${resp}" | grep 'denied') ]; then
+    # E.g., mkdir: cannot create directory `tmp': Permission denied
+    $DEBUG_TRACE && >&2 echo "Mutex cannot be created but: DONT_FLOCKIN_CARE."
+
+    got_lock=0
+  else
+    $DEBUG_TRACE && >&2 echo "ERROR: Unexpected response from mkdir: $resp."
+
+    got_lock=2
+  fi
 }
 
 # ***
