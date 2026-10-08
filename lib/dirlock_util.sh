@@ -37,6 +37,8 @@ dirlock() {
   local FLOCKING_RE_TRIES=${4:-0}
   # Use -1 to mean forever, 0 to ignore, or max. # of secs (int or float).
   local FLOCKING_TIME_OUT="${5:-0}"
+  # Use 0 to disable, or positive number of secs. after which to alert user.
+  local LONG_WAIT_MESG_AT="${6:-0}"
 
   # 0: got lock / 1: timed out / 2: other error
   local got_lock=2
@@ -78,6 +80,7 @@ dirlock() {
         >&2 echo "ERROR: Unexpected mkdir error (missing 'exists'): ${resp}"
       fi
 
+      local long_wait_messaged=false
       local debug_traced_once=false
       while [ ${FLOCKING_RE_TRIES} -ne 0 ]; do
         local debug_trace_time_0
@@ -101,7 +104,8 @@ dirlock() {
             got_lock=1
             FLOCKING_RE_TRIES=0
           else
-            # There's still time left, but see if an echo is in order.
+            # There's still time left, but see if any echo is in order.
+            print_stderr_when_waiting_longer_than_threshold
             debug_trace_opt_in_waiting_message_periodically
           fi
         # else, loop forever, maybe. ;)
@@ -192,6 +196,20 @@ count_dirlock_failed_and_sleep_before_trying_again() {
 
   fcn_time_1=$(print_nanos_now)
   elapsed_time=$(echo "${fcn_time_1} - ${fcn_time_0}" | bc -l)
+}
+
+# ***
+
+print_stderr_when_waiting_longer_than_threshold() {
+  if ! ${long_wait_messaged} &&
+    [ "${LONG_WAIT_MESG_AT}" != "0" ] &&
+    [ $(echo "${LONG_WAIT_MESG_AT} > ${elapsed_time}" | bc -l) -eq 1 ] &&
+    true; then
+
+    >&2 echo "Still waiting for the mutex, please hold on!..."
+
+    long_wait_messaged=true
+  fi
 }
 
 debug_trace_opt_in_waiting_message_periodically() {
