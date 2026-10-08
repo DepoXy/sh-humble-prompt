@@ -65,12 +65,9 @@ dirlock() {
 
     return ${got_lock}
   else
-    # We could not get the mutex.
-    #
-    # We'll either: a) try again; b) give up; or c) fail miserably.
-    #
-    # E.g., mkdir: cannot create directory `tmp': Permission denied
+    # Could not get the mutex, so either: a) try again; b) give up; or c) fail miserably.
     if printf "${resp}" | grep -q 'denied'; then
+      # Failed, but not because exists, e.g.: cannot create directory `tmp': Permission denied
       print_stderr_gaffe_on_unexpected_denied_response
     #
     # We expect that the directory already exists... though maybe the other
