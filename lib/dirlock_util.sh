@@ -155,20 +155,7 @@ dirlock() {
     fi
   fi
 
-  if [ ${got_lock} -eq 0 ]; then
-    chmod 2777 -- "${FLOCKING_DIR_PATH}" &>/dev/null
-    # Let the world know who's the boss.
-    local script_name
-    local receipt_path
-    script_name=$(basename -- "$0")
-    receipt_path="${FLOCKING_DIR_PATH}--${script_name}"
-    $DEBUG_TRACE && >&2 echo "Creating backref: ${FLOCKING_DIR_PATH}"
-    mkdir -p -- "${receipt_path}"
-  elif ${FLOCKING_REQUIRED}; then
-    $DEBUG_TRACE && >&2 echo "Mutex in use: giving up!"
-    $DEBUG_TRACE && >&2 echo "Could not secure flock dir: Bailing now."
-    $DEBUG_TRACE && >&2 echo "FLOCKING_DIR_PATH: ${FLOCKING_DIR_PATH}"
-  fi
+  finish_dirlocking ${got_lock}
 
   return ${got_lock}
 }
@@ -211,6 +198,27 @@ debug_trace_opt_in_waiting_message_periodically() {
       "${elapsed_mins} mins.; still trying..."
 
     debug_trace_time_0=$(print_nanos_now)
+  fi
+}
+
+# ***
+
+finish_dirlocking() {
+  local got_lock="$1"
+
+  if [ ${got_lock} -eq 0 ]; then
+    chmod 2777 -- "${FLOCKING_DIR_PATH}" &>/dev/null
+    # Let the world know who's the boss.
+    local script_name
+    local receipt_path
+    script_name=$(basename -- "$0")
+    receipt_path="${FLOCKING_DIR_PATH}--${script_name}"
+    $DEBUG_TRACE && >&2 echo "Creating backref: ${FLOCKING_DIR_PATH}"
+    mkdir -p -- "${receipt_path}"
+  elif ${FLOCKING_REQUIRED}; then
+    $DEBUG_TRACE && >&2 echo "Mutex in use: giving up!"
+    $DEBUG_TRACE && >&2 echo "Could not secure flock dir: Bailing now."
+    $DEBUG_TRACE && >&2 echo "FLOCKING_DIR_PATH: ${FLOCKING_DIR_PATH}"
   fi
 }
 
