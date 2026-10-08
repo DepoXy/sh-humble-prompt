@@ -69,16 +69,15 @@ dirlock() {
     if printf "${resp}" | grep -q 'denied'; then
       # Failed, but not because exists, e.g.: cannot create directory `tmp': Permission denied
       print_stderr_gaffe_on_unexpected_denied_response
-    #
-    # We expect that the directory already exists... though maybe the other
-    # process deleted it already!
-    #   elif [[ ! `echo $resp | grep exists` ]]; then
-    #     $DEBUG_TRACE && >&2 echo "ERROR: Unexpected response from mkdir: $resp."
-    #     $DEBUG_TRACE && >&2 echo ""
-    #
-    #     return ${got_lock}
-    #   fi
     else
+      if ! printf "${resp}" | grep -q 'exists'; then
+        # $DEBUG_TRACE && >&2 echo "ERROR: Unexpected mkdir error (missing 'exists'): ${resp}"
+        # $DEBUG_TRACE && >&2 echo ""
+        #
+        # return ${got_lock}
+        >&2 echo "ERROR: Unexpected mkdir error (missing 'exists'): ${resp}"
+      fi
+
       local debug_traced_once=false
       while [ ${FLOCKING_RE_TRIES} -ne 0 ]; do
         local debug_trace_time_0
