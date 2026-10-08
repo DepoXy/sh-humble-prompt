@@ -165,17 +165,7 @@ dirlock() {
             FLOCKING_RE_TRIES=0
           else
             # There's still time left, but see if an echo is in order.
-            local prev_debug_trace
-            prev_debug_trace=$(echo "${fcn_time_1} - ${debug_trace_time_0}" | bc -l)
-            # What's a good time here? Every ten minutes?
-            if [ $(echo "${prev_debug_trace} > ${HUMBLE_TRACE_FREQ:-600}" | bc -l) -eq 1 ]; then
-              local elapsed_mins
-              elapsed_mins=$(echo "(${fcn_time_1} - ${fcn_time_0}) / 60.0" | bc -l)
-              $DEBUG_TRACE && >&2 echo \
-                "Update: Mutex still in use after: " \
-                "${elapsed_mins} mins.; still trying..."
-              debug_trace_time_0=$(print_nanos_now)
-            fi
+            debug_trace_opt_in_waiting_message_periodically
           fi
         # else, loop forever, maybe. ;)
         fi
@@ -200,6 +190,27 @@ dirlock() {
 
   return ${got_lock}
 }
+
+# ***
+
+debug_trace_opt_in_waiting_message_periodically() {
+  local prev_debug_trace
+  prev_debug_trace=$(echo "${fcn_time_1} - ${debug_trace_time_0}" | bc -l)
+
+  # What's a good time here? Every ten minutes?
+  if [ $(echo "${prev_debug_trace} > ${HUMBLE_TRACE_FREQ:-600}" | bc -l) -eq 1 ]; then
+    local elapsed_mins
+    elapsed_mins=$(echo "(${fcn_time_1} - ${fcn_time_0}) / 60.0" | bc -l)
+
+    $DEBUG_TRACE && >&2 echo \
+      "Update: Mutex still in use after: " \
+      "${elapsed_mins} mins.; still trying..."
+
+    debug_trace_time_0=$(print_nanos_now)
+  fi
+}
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
 
 dunlock() {
   local FLOCKING_DIR_PATH="$1"
