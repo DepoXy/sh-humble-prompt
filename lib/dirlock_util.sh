@@ -71,15 +71,7 @@ dirlock() {
     #
     # E.g., mkdir: cannot create directory `tmp': Permission denied
     if [ $(printf "${resp}" | grep 'denied') ]; then
-      # This is a developer problem. Fix perms. and try again.
-      >&2 echo
-      >&2 echo "=============================================="
-      >&2 echo "GAFFE: The directory could not be created."
-      >&2 echo "- Hey, you, DEV: This is probably _your_ fault."
-      >&2 echo "  - Try:"
-      >&2 echo "    chmod 2775 $(dirname -- "${FLOCKING_DIR_PATH}")"
-      >&2 echo "=============================================="
-      >&2 echo
+      print_stderr_gaffe_on_unexpected_denied_response
     #
     # We expect that the directory already exists... though maybe the other
     # process deleted it already!
@@ -148,6 +140,20 @@ debug_trace_immediate_defeat() {
 
     got_lock=2
   fi
+}
+
+# ***
+
+# This is a developer problem. Fix perms. and try again.
+print_stderr_gaffe_on_unexpected_denied_response() {
+  >&2 echo
+  >&2 echo "=============================================="
+  >&2 echo "GAFFE: The directory could not be created."
+  >&2 echo "- Hey, you, DEV: This is probably _your_ fault."
+  >&2 echo "  - Try:"
+  >&2 echo "    chmod 2775 $(dirname -- "${FLOCKING_DIR_PATH}")"
+  >&2 echo "=============================================="
+  >&2 echo
 }
 
 # ***
